@@ -1,33 +1,29 @@
-import { MessagesSquare, Puzzle, RectangleHorizontal } from 'lucide-react'
+import { Layers, MessagesSquare, Puzzle, Upload } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import Button from '../ui/Button'
-import Card from '../ui/Card'
 
 const actions = [
-  { to: '/study/socratic/demo-document', label: 'Socratic session', icon: MessagesSquare },
-  { to: '/study/quiz/demo-document', label: 'Quick quiz', icon: Puzzle },
-  { to: '/study/flashcard/demo-document', label: 'Flashcards', icon: RectangleHorizontal },
+  { to: '/documents', label: 'Upload', icon: Upload },
+  { to: '/study/socratic/demo-document', label: 'Socratic Session', icon: MessagesSquare },
+  { to: '/study/quiz/demo-document', label: 'Quiz', icon: Puzzle },
+  { to: '/study/flashcard/demo-document', label: 'Flashcards', icon: Layers },
 ]
 
 export default function QuickStartButtons() {
   return (
-    <Card className="space-y-4">
-      <div>
-        <p className="text-xs uppercase tracking-[0.22em] text-socra-sand">Quick start</p>
-        <h2 className="mt-2 text-2xl font-semibold text-socra-stone">Launch a study mode</h2>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-3">
+    <section className="mb-stack-lg mt-section-gap">
+      <h2 className="mb-stack-md font-label-lg text-label-lg uppercase tracking-widest text-primary">Quick Start</h2>
+      <div className="grid grid-cols-2 gap-stack-md md:grid-cols-4">
         {actions.map(({ icon: Icon, label, to }) => (
-          <Link key={to} to={to}>
-            <Button className="w-full justify-between" variant="secondary">
-              <span className="inline-flex items-center gap-2">
-                <Icon className="h-4 w-4" />
-                {label}
-              </span>
-            </Button>
+          <Link
+            className="tactile-button flex flex-col items-center gap-stack-sm rounded-xl bg-[#656d4a] p-stack-md text-[#c2c5aa] hover:brightness-110"
+            key={label}
+            to={to}
+          >
+            <Icon className="h-7 w-7" />
+            <span className="font-label-lg text-label-lg">{label}</span>
           </Link>
         ))}
       </div>
-    </Card>
+    </section>
   )
 }

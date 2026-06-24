@@ -1,5 +1,4 @@
 import { Lightbulb } from 'lucide-react'
-import Button from '../../ui/Button'
 
 interface HintButtonProps {
   onClick?: () => void
@@ -7,8 +6,13 @@ interface HintButtonProps {
 
 export default function HintButton({ onClick }: HintButtonProps) {
   return (
-    <Button iconLeft={<Lightbulb className="h-4 w-4" />} variant="secondary" onClick={onClick}>
-      Need a hint?
-    </Button>
+    <button
+      className="group flex items-center gap-2 rounded-full border border-outline-variant px-6 py-2 font-label-lg text-label-lg text-outline transition-all hover:border-primary hover:text-primary"
+      onClick={onClick}
+      type="button"
+    >
+      <Lightbulb className="transition-transform group-hover:rotate-12" size={18} />
+      I'm stuck — give me a hint
+    </button>
   )
 }

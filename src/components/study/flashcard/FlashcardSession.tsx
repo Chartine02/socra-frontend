@@ -1,7 +1,6 @@
-import { useState } from 'react'
-import Button from '../../ui/Button'
-import Card from '../../ui/Card'
-import type { Flashcard as FlashcardType } from '../../../types/study.types'
+import { useCallback, useEffect, useState } from 'react'
+import { Clock, RefreshCw } from 'lucide-react'
+import type { Flashcard as FlashcardType, SelfRating } from '../../../types/study.types'
 import Flashcard from './Flashcard'
 import SelfRatingButtons from './SelfRatingButtons'
 
@@ -12,36 +11,66 @@ interface FlashcardSessionProps {
 export default function FlashcardSession({ flashcards }: FlashcardSessionProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
+  const total = flashcards.length
   const currentCard = flashcards[currentIndex]
+  const progress = total > 0 ? Math.round((currentIndex / total) * 100) : 0
+
+  const flip = useCallback(() => setIsFlipped((value) => !value), [])
+
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.code === 'Space') {
+        event.preventDefault()
+        flip()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeydown)
+
+    return () => window.removeEventListener('keydown', handleKeydown)
+  }, [flip])
+
+  const handleRate = (_rating: SelfRating) => {
+    setIsFlipped(false)
+    setCurrentIndex((value) => Math.min(value + 1, total - 1))
+  }
 
   return (
-    <Card className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-[0.22em] text-socra-sand">Flashcards</p>
-          <h2 className="mt-2 text-2xl font-semibold text-socra-stone">Scheduled retrieval reps</h2>
+    <div className="flex w-full flex-col items-center">
+      {/* Review Progress Header */}
+      <div className="mb-stack-lg w-full max-w-[720px] space-y-stack-sm">
+        <div className="flex items-end justify-between">
+          <h1 className="font-headline-md text-headline-md text-on-surface">
+            {currentIndex + 1} of {total} cards reviewed
+          </h1>
+          <div className="flex items-center gap-unit text-on-surface-variant">
+            <Clock size={14} />
+            <span className="font-label-sm text-label-sm uppercase tracking-wider">Next review: Tomorrow</span>
+          </div>
         </div>
-        <p className="text-sm text-socra-tan">
-          {currentIndex + 1} / {flashcards.length}
-        </p>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container">
+          <div
+            className="h-full rounded-full bg-primary-container transition-all duration-700 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
-      <Flashcard card={currentCard} isFlipped={isFlipped} />
-      <div className="flex flex-wrap gap-3">
-        <Button onClick={() => setIsFlipped((value) => !value)}>
-          {isFlipped ? 'Hide answer' : 'Reveal answer'}
-        </Button>
-        <Button
-          disabled={currentIndex === flashcards.length - 1}
-          variant="secondary"
-          onClick={() => {
-            setCurrentIndex((value) => Math.min(value + 1, flashcards.length - 1))
-            setIsFlipped(false)
-          }}
+
+      {/* Flashcard */}
+      <Flashcard card={currentCard} isFlipped={isFlipped} onFlip={flip} />
+
+      {/* Action Controls */}
+      <div className="mt-stack-lg flex w-full flex-col items-center gap-stack-md">
+        <button
+          className="flex w-full max-w-[280px] items-center justify-center gap-stack-sm rounded-xl border-b-4 border-secondary-container bg-primary-container py-4 font-label-lg text-label-lg text-on-primary-container transition-all duration-150 hover:brightness-110 active:translate-y-1 active:border-b-0"
+          onClick={flip}
+          type="button"
         >
-          Next card
-        </Button>
+          <RefreshCw size={20} />
+          Flip Card
+        </button>
+        {isFlipped && <SelfRatingButtons onSelect={handleRate} />}
       </div>
-      <SelfRatingButtons />
-    </Card>
+    </div>
   )
 }

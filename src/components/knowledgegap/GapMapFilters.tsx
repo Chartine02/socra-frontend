@@ -1,4 +1,3 @@
-import Button from '../ui/Button'
 import type { MasteryState } from '../../types/study.types'
 
 interface GapMapFiltersProps {
@@ -6,20 +5,29 @@ interface GapMapFiltersProps {
   onChange: (value: MasteryState | 'all') => void
 }
 
-const filters: Array<MasteryState | 'all'> = ['all', 'mastered', 'shaky', 'forgotten']
+const filters: { value: MasteryState | 'all'; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'mastered', label: 'Mastered' },
+  { value: 'shaky', label: 'Needs Review' },
+  { value: 'forgotten', label: 'Forgotten' },
+]
 
 export default function GapMapFilters({ activeFilter, onChange }: GapMapFiltersProps) {
   return (
-    <div className="flex flex-wrap gap-3">
-      {filters.map((filter) => (
-        <Button
-          key={filter}
-          size="sm"
-          variant={activeFilter === filter ? 'primary' : 'secondary'}
-          onClick={() => onChange(filter)}
+    <div className="flex flex-wrap gap-stack-sm rounded-xl border border-outline/10 bg-surface-container-low p-2">
+      {filters.map(({ value, label }) => (
+        <button
+          key={value}
+          className={`rounded-lg px-4 py-2 font-label-lg text-label-lg transition-colors ${
+            activeFilter === value
+              ? 'bg-primary-container text-on-primary-container'
+              : 'text-on-surface-variant hover:bg-surface-container-high'
+          }`}
+          onClick={() => onChange(value)}
+          type="button"
         >
-          {filter === 'all' ? 'All' : filter.charAt(0).toUpperCase() + filter.slice(1)}
-        </Button>
+          {label}
+        </button>
       ))}
     </div>
   )

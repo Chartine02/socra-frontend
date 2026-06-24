@@ -1,11 +1,13 @@
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { authService } from '../../services/authService'
+import { authService, DEMO_CREDENTIALS } from '../../services/authService'
 import { useAuth } from '../../hooks/useAuth'
-import { Button, Card, Input } from '../ui'
+import Spinner from '../ui/Spinner'
 import type { LoginCredentials } from '../../types/auth.types'
 
 const signInSchema = z.object({
@@ -17,10 +19,12 @@ export default function SignInForm() {
   const navigate = useNavigate()
   const location = useLocation()
   const { setToken, setUser } = useAuth()
+  const [showPassword, setShowPassword] = useState(false)
   const {
     formState: { errors },
     handleSubmit,
     register,
+    setValue,
   } = useForm<LoginCredentials>({
     resolver: zodResolver(signInSchema),
   })
@@ -36,21 +40,87 @@ export default function SignInForm() {
   })
 
   return (
-    <Card className="w-full max-w-xl space-y-6">
-      <div className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.26em] text-socra-sand">Welcome back</p>
-        <h1 className="text-3xl font-semibold text-socra-stone">Continue your retrieval practice.</h1>
-        <p className="text-sm text-socra-tan">Sign in to resume your personalised formative assessments.</p>
-      </div>
+    <div className="w-full max-w-md">
+      <div className="socra-card rounded-xl p-stack-lg shadow-2xl">
+        <div className="mb-stack-lg text-center">
+          <Link to="/" className="mb-2 inline-block font-headline-lg text-headline-lg text-primary">
+            SOCRA
+          </Link>
+          <p className="font-body-md text-body-md text-on-surface-variant">Welcome back, Scholar.</p>
+        </div>
 
-      <form className="space-y-4" onSubmit={handleSubmit((values) => mutation.mutate(values))}>
-        <Input error={errors.email?.message} label="Email" placeholder="name@university.edu" {...register('email')} />
-        <Input error={errors.password?.message} label="Password" placeholder="••••••••" type="password" {...register('password')} />
-        {mutation.error ? <p className="text-sm text-socra-richbrown">{mutation.error.message}</p> : null}
-        <Button className="w-full" isLoading={mutation.isPending} type="submit">
-          Sign in
-        </Button>
-      </form>
-    </Card>
+        <form className="space-y-stack-md" onSubmit={handleSubmit((values) => mutation.mutate(values))}>
+          <div className="space-y-1">
+            <label className="px-1 font-label-lg text-label-lg text-on-surface-variant">Email Address</label>
+            <input
+              className="input-field w-full rounded-lg px-4 py-3 font-body-md"
+              placeholder="student@university.ac.rw"
+              type="email"
+              {...register('email')}
+            />
+            {errors.email?.message ? <p className="px-1 text-label-sm text-error">{errors.email.message}</p> : null}
+          </div>
+
+          <div className="space-y-1">
+            <div className="flex items-center justify-between px-1">
+              <label className="font-label-lg text-label-lg text-on-surface-variant">Password</label>
+              <Link className="font-label-sm text-tertiary hover:underline" to="/forgot-password">
+                Forgot password?
+              </Link>
+            </div>
+            <div className="relative">
+              <input
+                className="input-field w-full rounded-lg px-4 py-3 pr-12 font-body-md"
+                placeholder="••••••••"
+                type={showPassword ? 'text' : 'password'}
+                {...register('password')}
+              />
+              <button
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant transition-colors hover:text-primary"
+                onClick={() => setShowPassword((value) => !value)}
+                type="button"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            {errors.password?.message ? <p className="px-1 text-label-sm text-error">{errors.password.message}</p> : null}
+          </div>
+
+          {mutation.error ? <p className="px-1 text-label-sm text-error">{mutation.error.message}</p> : null}
+
+          <button
+            className="btn-primary mt-4 flex w-full items-center justify-center gap-2 rounded-lg py-4 font-label-lg uppercase tracking-wider"
+            disabled={mutation.isPending}
+            type="submit"
+          >
+            {mutation.isPending ? <Spinner size="sm" /> : null}
+            Sign In
+          </button>
+
+          <button
+            className="w-full rounded-lg border border-dashed border-outline/40 bg-surface-container/40 px-4 py-3 text-left transition-colors hover:border-primary/50"
+            onClick={() => {
+              setValue('email', DEMO_CREDENTIALS.email)
+              setValue('password', DEMO_CREDENTIALS.password)
+            }}
+            type="button"
+          >
+            <p className="font-label-sm uppercase tracking-wider text-tertiary">Demo account — tap to fill</p>
+            <p className="mt-1 font-body-md text-on-surface-variant">
+              {DEMO_CREDENTIALS.email} / {DEMO_CREDENTIALS.password}
+            </p>
+          </button>
+        </form>
+
+        <div className="mt-stack-lg text-center">
+          <p className="font-body-md text-on-surface-variant">
+            Don't have an account?{' '}
+            <Link className="font-bold text-tertiary hover:underline" to="/signup">
+              Sign up
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   )
 }

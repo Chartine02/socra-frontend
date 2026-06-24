@@ -1,33 +1,31 @@
 import BottomNav from '../components/layout/BottomNav'
 import Navbar from '../components/layout/Navbar'
-import PageWrapper from '../components/layout/PageWrapper'
-import PostSessionSummary from '../components/session/PostSessionSummary'
-import type { SessionSummary } from '../types/analytics.types'
+import PostSessionSummary, { type SessionSummaryView } from '../components/session/PostSessionSummary'
 
-const summary: SessionSummary = {
-  sessionId: 'session-1',
-  documentId: 'doc-1',
-  mode: 'quiz',
-  completedAt: new Date(),
-  durationMinutes: 24,
-  accuracy: 78,
-  bloomCoverage: {
-    remember: 3,
-    understand: 5,
-    apply: 4,
-    analyse: 2,
-    evaluate: 1,
-    create: 0,
-  },
+const summary: SessionSummaryView = {
+  badgeLabel: 'Socratic Session',
+  title: 'Macroeconomics 101',
+  message: 'Strong session. You pushed into Analyse level today.',
+  topicsCovered: 8,
+  accuracy: 92,
+  streakDays: 5,
+  masteredTopics: [
+    { name: 'Aggregate Demand Curves', level: 4 },
+    { name: 'Fiscal Policy Multipliers', level: 3 },
+    { name: 'Consumer Price Index', level: 5 },
+  ],
+  needsReview: ['Liquidity Preference Theory', 'Open Market Operations'],
+  nextDescription: "Based on your performance, let's bridge the gap in your Monetary Policy knowledge.",
+  suggestions: ["The Fed's Toolbox", 'Interest Rate Dynamics'],
 }
 
 export default function PostSessionPage() {
   return (
-    <div className="socra-shell min-h-screen">
+    <div className="library-mesh min-h-screen pb-24 md:pb-0">
       <Navbar />
-      <PageWrapper title="Post-session summary" subtitle="Inspect performance, Bloom-level spread, and where to focus next.">
+      <main className="mx-auto max-w-4xl px-container-margin py-stack-lg">
         <PostSessionSummary summary={summary} />
-      </PageWrapper>
+      </main>
       <BottomNav />
     </div>
   )

@@ -1,40 +1,49 @@
-import { useState } from 'react'
-import Badge from '../../ui/Badge'
-import Button from '../../ui/Button'
-import Card from '../../ui/Card'
-import type { ConfidenceRating as ConfidenceRatingType, QuizQuestion } from '../../../types/study.types'
+import type { QuizQuestion } from '../../../types/study.types'
+import { BLOOM_LABELS } from '../../../utils/constants'
 import AnswerOption from './AnswerOption'
-import ConfidenceRating from './ConfidenceRating'
-import QuizFeedback from './QuizFeedback'
+
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']
 
 interface QuestionCardProps {
   question: QuizQuestion
+  selectedOption: number | null
+  onSelect: (index: number) => void
+  showFeedback: boolean
 }
 
-export default function QuestionCard({ question }: QuestionCardProps) {
-  const [selectedOption, setSelectedOption] = useState<number | null>(null)
-  const [confidence, setConfidence] = useState<ConfidenceRatingType | undefined>()
-  const [showFeedback, setShowFeedback] = useState(false)
-
+export default function QuestionCard({ onSelect, question, selectedOption, showFeedback }: QuestionCardProps) {
   return (
-    <Card className="space-y-6">
-      <div className="space-y-3">
-        <Badge bloomLevel={question.bloomLevel} />
-        <h2 className="text-2xl font-semibold text-socra-stone">{question.questionText}</h2>
+    <section className="flex w-full flex-grow flex-col space-y-stack-md">
+      <div className="space-y-stack-md rounded-xl border-b-4 border-socra-darkest bg-socra-dark p-stack-lg">
+        <span className="inline-flex items-center rounded-lg bg-socra-deepbrown px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-white">
+          {BLOOM_LABELS[question.bloomLevel]}
+        </span>
+        <h1 className="font-body-lg text-headline-md italic leading-relaxed text-on-surface md:text-headline-lg">
+          “{question.questionText}”
+        </h1>
       </div>
-      <div className="space-y-3">
-        {question.options.map((option, index) => (
-          <AnswerOption key={option} isSelected={selectedOption === index} label={option} onClick={() => setSelectedOption(index)} />
-        ))}
+      <div className="grid w-full grid-cols-1 gap-stack-md">
+        {question.options.map((option, index) => {
+          let state: 'correct' | 'incorrect' | null = null
+
+          if (showFeedback) {
+            if (index === question.correctOptionIndex) state = 'correct'
+            else if (index === selectedOption) state = 'incorrect'
+          }
+
+          return (
+            <AnswerOption
+              key={option}
+              disabled={showFeedback}
+              isSelected={selectedOption === index}
+              label={option}
+              letter={LETTERS[index]}
+              state={state}
+              onClick={() => onSelect(index)}
+            />
+          )
+        })}
       </div>
-      <div className="space-y-3">
-        <p className="text-sm text-socra-tan">How sure are you?</p>
-        <ConfidenceRating value={confidence} onChange={setConfidence} />
-      </div>
-      <Button disabled={selectedOption === null || !confidence} onClick={() => setShowFeedback(true)}>
-        Check answer
-      </Button>
-      {showFeedback ? <QuizFeedback explanation={question.explanation} sourceExcerpt={question.sourceExcerpt} /> : null}
-    </Card>
+    </section>
   )
 }

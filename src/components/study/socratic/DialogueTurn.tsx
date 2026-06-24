@@ -1,5 +1,5 @@
+import { Brain } from 'lucide-react'
 import type { DialogueTurn as DialogueTurnType } from '../../../types/study.types'
-import BloomLevelPill from './BloomLevelPill'
 
 interface DialogueTurnProps {
   turn: DialogueTurnType
@@ -8,22 +8,27 @@ interface DialogueTurnProps {
 export default function DialogueTurn({ turn }: DialogueTurnProps) {
   const isAi = turn.role === 'ai'
 
-  return (
-    <div className={`flex ${isAi ? 'justify-start' : 'justify-end'}`}>
-      <div
-        className={`max-w-2xl rounded-2xl border px-4 py-3 ${
-          isAi
-            ? 'border-socra-forest/20 bg-socra-dark text-socra-stone'
-            : 'border-socra-midbrown/30 bg-socra-midbrown/10 text-socra-stone'
-        }`}
-      >
-        <div className="mb-2 flex items-center justify-between gap-3">
-          <p className="text-sm font-medium uppercase tracking-[0.22em] text-socra-sand">
-            {isAi ? 'SOCRA' : 'You'}
-          </p>
-          <BloomLevelPill level={turn.bloomLevel} />
+  if (isAi) {
+    return (
+      <div className="flex flex-col items-start">
+        <div className="mb-2 flex items-center gap-2">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-container">
+            <Brain className="text-on-primary-container" size={14} />
+          </div>
+          <span className="font-label-lg text-label-lg text-on-surface-variant">SOCRA AI</span>
         </div>
-        <p className="leading-7">{turn.content}</p>
+        <div className="socratic-card-shadow rounded-2xl rounded-tl-none border border-primary-container/30 bg-socra-dark p-stack-md">
+          <p className="font-body-lg text-body-lg italic leading-snug text-socra-stone">"{turn.content}"</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col items-end">
+      <span className="mb-2 font-label-lg text-label-lg text-on-surface-variant">You</span>
+      <div className="rounded-2xl rounded-tr-none border border-outline-variant/20 bg-surface-container-high p-stack-md">
+        <p className="font-body-lg text-body-lg leading-snug text-on-surface">{turn.content}</p>
       </div>
     </div>
   )

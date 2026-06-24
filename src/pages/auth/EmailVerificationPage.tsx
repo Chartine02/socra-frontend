@@ -1,35 +1,35 @@
-import { MailCheck } from 'lucide-react'
+import { Mail } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import Navbar from '../../components/layout/Navbar'
-import PageWrapper from '../../components/layout/PageWrapper'
-import Button from '../../components/ui/Button'
-import Card from '../../components/ui/Card'
 
 export default function EmailVerificationPage() {
   return (
-    <div className="socra-shell min-h-screen">
-      <Navbar />
-      <PageWrapper>
-        <div className="flex flex-1 items-center justify-center">
-          <Card className="w-full max-w-lg text-center">
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <h1 className="text-3xl">Verify your email</h1>
-                <p className="text-sm text-socra-tan">Activate your SOCRA workspace to unlock study sessions.</p>
-              </div>
-              <span className="mx-auto inline-flex h-16 w-16 items-center justify-center rounded-full bg-socra-forest/15 text-socra-sage">
-                <MailCheck size={26} />
-              </span>
-              <p className="leading-7 text-socra-tan">
-                We’ve sent a verification link to your inbox. Once confirmed, you can continue to onboarding and upload your first document.
-              </p>
-              <Link to="/signin">
-                <Button>Return to Sign In</Button>
-              </Link>
-            </div>
-          </Card>
+    <div className="flex min-h-screen items-center justify-center bg-socra-darkest p-gutter">
+      <div className="w-full max-w-md">
+        <div className="socra-card rounded-xl p-stack-lg text-center shadow-2xl">
+          <div className="mb-stack-lg inline-flex h-20 w-20 items-center justify-center rounded-full bg-tertiary-container/20">
+            <Mail className="text-tertiary-container" size={40} />
+          </div>
+          <h2 className="mb-2 font-headline-md text-headline-md text-on-surface">Check your inbox</h2>
+          <p className="mb-stack-lg font-body-md text-on-surface-variant">
+            We've sent a verification link to your email. Click the link to activate your SOCRA account and start
+            learning.
+          </p>
+          <div className="space-y-4">
+            <Link
+              className="btn-primary block w-full rounded-lg py-4 font-label-lg uppercase tracking-wider"
+              to="/signin"
+            >
+              Back to Sign In
+            </Link>
+            <p className="font-label-sm text-on-surface-variant">
+              Didn't receive an email?{' '}
+              <a className="text-tertiary hover:underline" href="#resend">
+                Resend Link
+              </a>
+            </p>
+          </div>
         </div>
-      </PageWrapper>
+      </div>
     </div>
   )
 }

@@ -22,7 +22,9 @@ export interface GapMapNode {
   topic: string
   masteryState: MasteryState
   masteryPercentage: number
-  bubbleSize: number
+  bubbleSize?: number
+  description?: string
+  lastReviewed?: string
 }
 
 export interface GapMapData {

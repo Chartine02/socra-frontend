@@ -1,19 +1,28 @@
 import type { SelfRating } from '../../../types/study.types'
-import Button from '../../ui/Button'
 
 interface SelfRatingButtonsProps {
   onSelect?: (value: SelfRating) => void
 }
 
-const ratings: SelfRating[] = ['forgot', 'hard', 'good', 'easy']
+const ratings: { value: SelfRating; label: string; className: string }[] = [
+  { value: 'forgot', label: 'Forgot', className: 'bg-socra-richbrown border-[#3d1f08]' },
+  { value: 'hard', label: 'Hard', className: 'bg-socra-dark border-on-secondary' },
+  { value: 'good', label: 'Good', className: 'bg-primary-container border-secondary-container' },
+  { value: 'easy', label: 'Easy', className: 'bg-socra-midbrown border-socra-deepbrown' },
+]
 
 export default function SelfRatingButtons({ onSelect }: SelfRatingButtonsProps) {
   return (
-    <div className="grid gap-3 sm:grid-cols-4">
-      {ratings.map((rating) => (
-        <Button key={rating} variant={rating === 'forgot' ? 'destructive' : 'secondary'} onClick={() => onSelect?.(rating)}>
-          {rating}
-        </Button>
+    <div className="flex gap-stack-md">
+      {ratings.map(({ value, label, className }) => (
+        <button
+          key={value}
+          className={`rounded-lg border-b-2 px-gutter py-stack-sm font-label-sm text-label-sm text-on-surface transition-all active:translate-y-px ${className}`}
+          onClick={() => onSelect?.(value)}
+          type="button"
+        >
+          {label}
+        </button>
       ))}
     </div>
   )
