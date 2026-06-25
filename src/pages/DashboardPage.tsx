@@ -13,8 +13,8 @@ const bubbles = [
     action: 'Review',
     to: '/study/socratic/demo-document',
     size: 'h-48 w-48 md:h-56 md:w-56',
-    color: 'bg-[#a4ac86] text-surface',
-    actionColor: 'bg-surface text-on-surface hover:bg-surface-bright',
+    color: 'bg-[#a4ac86] text-white',
+    actionColor: 'bg-white text-on-background shadow-sm hover:bg-surface-container-highest',
     position: '',
   },
   {
@@ -23,8 +23,8 @@ const bubbles = [
     action: 'Study Now',
     to: '/study/quiz/demo-document',
     size: 'h-36 w-36 md:h-44 md:w-44',
-    color: 'bg-[#936639] text-on-surface',
-    actionColor: 'bg-primary-container text-on-primary-container',
+    color: 'bg-[#936639] text-white',
+    actionColor: 'bg-white text-[#936639] shadow-sm',
     position: 'translate-y-8',
   },
   {
@@ -33,15 +33,15 @@ const bubbles = [
     action: 'Focus',
     to: '/study/flashcard/demo-document',
     size: 'h-28 w-28 md:h-32 md:w-32',
-    color: 'bg-[#582f0e] text-[#ece2c3]',
-    actionColor: 'bg-on-surface text-surface',
+    color: 'bg-[#582f0e] text-white',
+    actionColor: 'bg-white text-[#582f0e] shadow-sm',
     position: '-translate-x-4 -translate-y-4',
   },
 ]
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-socra-darkest pb-24 md:pb-0">
+    <div className="min-h-screen bg-surface pb-24 font-body-md text-body-md md:pb-0">
       <Navbar />
       <main className="mx-auto max-w-7xl px-container-margin py-stack-lg">
         <WelcomeBanner />

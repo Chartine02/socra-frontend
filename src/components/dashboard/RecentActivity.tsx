@@ -3,7 +3,7 @@ import { ChevronRight, FileText, MessagesSquare, Puzzle } from 'lucide-react'
 const activities = [
   {
     icon: Puzzle,
-    iconWrap: 'bg-secondary-container text-secondary',
+    iconWrap: 'bg-primary-container text-white',
     title: 'Quiz: Biology',
     meta: '2 hours ago • 85% Score',
   },
@@ -15,7 +15,7 @@ const activities = [
   },
   {
     icon: MessagesSquare,
-    iconWrap: 'bg-primary-container text-on-primary-container',
+    iconWrap: 'bg-surface-variant text-primary',
     title: 'Socratic Session: Physics',
     meta: '2 days ago • Topic Cleared',
   },
@@ -28,7 +28,7 @@ export default function RecentActivity() {
       <div className="flex flex-col gap-stack-sm">
         {activities.map(({ icon: Icon, iconWrap, meta, title }) => (
           <div
-            className="custom-card group flex items-center gap-stack-md rounded-xl p-stack-md transition-colors hover:bg-surface-variant"
+            className="custom-card group flex items-center gap-stack-md rounded-xl p-stack-md transition-colors hover:bg-surface-container-highest"
             key={title}
           >
             <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${iconWrap}`}>

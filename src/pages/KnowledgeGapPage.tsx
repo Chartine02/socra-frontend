@@ -63,7 +63,7 @@ const stats: KnowledgeGapStats = {
 
 export default function KnowledgeGapPage() {
   return (
-    <div className="socra-shell min-h-screen pb-24 md:pb-0">
+    <div className="min-h-screen bg-surface pb-24 md:pb-0">
       <Navbar />
       <main className="mx-auto max-w-[1200px] px-container-margin py-stack-lg">
         <KnowledgeGapMap nodes={sampleNodes} stats={stats} />

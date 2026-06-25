@@ -21,17 +21,17 @@ export default function AnswerOption({
       : state === 'incorrect'
         ? 'border-forgotten ring-2 ring-forgotten/20'
         : isSelected
-          ? 'border-socra-sage ring-2 ring-socra-sage/20'
-          : 'border-transparent hover:border-outline-variant'
+          ? 'border-primary ring-2 ring-primary/20'
+          : 'border-outline-variant/40 hover:border-outline'
 
   const circleClass =
     isSelected || state
-      ? 'bg-primary-container text-on-primary-container'
-      : 'bg-surface-container text-on-surface-variant group-hover:bg-primary-container group-hover:text-on-primary-container'
+      ? 'bg-primary-container text-white'
+      : 'bg-surface-container-high text-on-surface-variant group-hover:bg-surface-container-highest'
 
   return (
     <button
-      className={`quiz-option-card group flex w-full items-start gap-4 rounded-xl border-2 bg-socra-dark p-stack-md text-left ${borderClass}`}
+      className={`quiz-option-card group flex w-full items-start gap-4 rounded-xl border-2 bg-white p-stack-md text-left ${borderClass}`}
       disabled={disabled}
       onClick={onClick}
       type="button"

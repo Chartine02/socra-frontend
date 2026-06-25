@@ -15,7 +15,7 @@ export default function QuickStartButtons() {
       <div className="grid grid-cols-2 gap-stack-md md:grid-cols-4">
         {actions.map(({ icon: Icon, label, to }) => (
           <Link
-            className="tactile-button flex flex-col items-center gap-stack-sm rounded-xl bg-[#656d4a] p-stack-md text-[#c2c5aa] hover:brightness-110"
+            className="tactile-button flex flex-col items-center gap-stack-sm rounded-xl bg-[#656d4a] p-stack-md text-white shadow-md hover:brightness-110"
             key={label}
             to={to}
           >

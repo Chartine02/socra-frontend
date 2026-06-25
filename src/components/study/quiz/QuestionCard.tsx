@@ -14,11 +14,11 @@ interface QuestionCardProps {
 export default function QuestionCard({ onSelect, question, selectedOption, showFeedback }: QuestionCardProps) {
   return (
     <section className="flex w-full flex-grow flex-col space-y-stack-md">
-      <div className="space-y-stack-md rounded-xl border-b-4 border-socra-darkest bg-socra-dark p-stack-lg">
-        <span className="inline-flex items-center rounded-lg bg-socra-deepbrown px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-white">
+      <div className="space-y-stack-md rounded-xl bg-primary-container p-stack-lg">
+        <span className="inline-flex items-center rounded-lg bg-[#434a2b] px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-white">
           {BLOOM_LABELS[question.bloomLevel]}
         </span>
-        <h1 className="font-body-lg text-headline-md italic leading-relaxed text-on-surface md:text-headline-lg">
+        <h1 className="font-body-lg text-headline-md italic leading-relaxed text-white md:text-headline-lg">
           “{question.questionText}”
         </h1>
       </div>

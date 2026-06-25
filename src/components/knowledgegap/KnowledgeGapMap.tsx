@@ -40,7 +40,7 @@ export default function KnowledgeGapMap({ nodes, stats }: KnowledgeGapMapProps) 
         </div>
 
         {/* Stats Summary Strip */}
-        <div className="grid grid-cols-2 gap-gutter rounded-xl border border-outline/5 bg-surface-container p-stack-md md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-gutter rounded-xl border border-outline-variant/30 bg-surface-container-low p-stack-md md:grid-cols-4">
           <div className="flex flex-col">
             <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
               Total Topics

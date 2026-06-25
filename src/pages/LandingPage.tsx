@@ -7,7 +7,7 @@ export default function LandingPage() {
   return (
     <div className="bg-background font-body-md text-body-md text-on-background">
       {/* Top Navigation */}
-      <header className="relative z-50 flex w-full items-center justify-between px-container-margin py-stack-md md:px-section-gap">
+      <header className="relative z-50 flex w-full items-center justify-between bg-surface px-container-margin py-stack-md md:px-section-gap">
         <Link className="font-headline-lg text-headline-lg font-bold text-primary" to="/">
           SOCRA
         </Link>
@@ -45,14 +45,14 @@ export default function LandingPage() {
               </p>
               <div className="flex flex-col justify-center gap-stack-md sm:flex-row md:justify-start">
                 <Link
-                  className="primary-action-btn flex items-center justify-center gap-2 rounded-xl bg-primary-container px-stack-lg py-4 font-label-lg text-label-lg text-on-primary-container"
+                  className="primary-action-btn flex items-center justify-center gap-2 rounded-xl bg-primary-container px-stack-lg py-4 font-label-lg text-label-lg text-on-primary-container transition-transform hover:scale-105"
                   to="/signup"
                 >
                   Get Started — It's Free
                   <span className="material-symbols-outlined">arrow_forward</span>
                 </Link>
                 <a
-                  className="rounded-xl border-2 border-outline px-stack-lg py-4 font-label-lg text-label-lg text-primary transition-all hover:bg-surface-container"
+                  className="rounded-xl border-2 border-outline px-stack-lg py-4 font-label-lg text-label-lg text-primary transition-all hover:bg-surface-container hover:scale-105"
                   href="#features"
                 >
                   See How It Works
@@ -86,7 +86,7 @@ export default function LandingPage() {
         </section>
 
         {/* Features Bento Grid */}
-        <section className="mx-auto max-w-7xl px-container-margin py-section-gap" id="features">
+        <section className="mx-auto max-w-7xl bg-surface px-container-margin py-section-gap" id="features">
           <div className="mb-stack-lg text-center">
             <h2 className="mb-stack-sm font-headline-lg text-headline-lg text-primary">
               Master your courses through inquiry
@@ -136,19 +136,19 @@ export default function LandingPage() {
         </section>
 
         {/* Contextual Content Section */}
-        <section className="bg-surface-container px-container-margin py-section-gap" id="institutions">
+        <section className="bg-surface-container-low px-container-margin py-section-gap" id="institutions">
           <div className="mx-auto flex max-w-7xl flex-col items-center gap-section-gap md:flex-row">
             <div className="order-2 md:order-1 md:w-1/2">
-              <div className="grid grid-cols-2 gap-stack-md">
-                <div className="rounded-xl bg-surface p-stack-md shadow-lg">
+              <div className="grid grid-cols-2 gap-stack-md items-start">
+                <div className="rounded-xl border border-outline-variant bg-white p-stack-md shadow-sm">
                   <span className="text-headline-lg font-bold text-primary">94%</span>
                   <p className="text-label-sm uppercase text-outline">Score Improvement</p>
                 </div>
-                <div className="rounded-xl bg-surface p-stack-md shadow-lg">
+                <div className="rounded-xl border border-outline-variant bg-white p-stack-md shadow-sm">
                   <span className="text-headline-lg font-bold text-tertiary">2.4hr</span>
                   <p className="text-label-sm uppercase text-outline">Saved Daily</p>
                 </div>
-                <div className="col-span-2 rounded-xl bg-surface p-stack-md shadow-lg">
+                <div className="col-span-2 rounded-xl border border-outline-variant bg-white p-stack-md shadow-sm">
                   <p className="text-body-md italic text-on-surface">
                     "SOCRA transformed how I study for my Engineering finals. I'm actually understanding the concepts,
                     not just memorizing slides."
@@ -175,7 +175,7 @@ export default function LandingPage() {
         </section>
 
         {/* Final CTA */}
-        <section className="px-container-margin py-section-gap text-center" id="pricing">
+        <section className="bg-surface px-container-margin py-section-gap text-center" id="pricing">
           <div className="relative mx-auto max-w-3xl overflow-hidden rounded-[2rem] bg-primary-container p-section-gap">
             <div
               className="pointer-events-none absolute inset-0 opacity-10"
@@ -197,7 +197,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-outline-variant bg-surface px-container-margin py-stack-lg">
+      <footer className="border-t border-outline-variant bg-surface-container-low px-container-margin py-stack-lg">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-stack-lg md:flex-row">
           <Link className="text-headline-md font-bold text-primary" to="/">
             SOCRA

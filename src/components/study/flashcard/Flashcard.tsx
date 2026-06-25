@@ -16,23 +16,23 @@ export default function Flashcard({ card, isFlipped = false, onFlip }: Flashcard
     >
       <motion.div
         animate={{ rotateY: isFlipped ? 180 : 0 }}
-        className="relative h-full w-full shadow-2xl [transform-style:preserve-3d]"
+        className="relative h-full w-full shadow-lg [transform-style:preserve-3d]"
         transition={{ duration: 0.6 }}
       >
         {/* Front Side */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl border-2 border-primary-container bg-socra-dark p-stack-lg text-center [backface-visibility:hidden]">
-          <span className="mb-stack-md font-label-sm text-label-sm uppercase tracking-widest text-on-secondary-container opacity-60">
+        <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl border-2 border-primary-container bg-surface-variant p-stack-lg text-center [backface-visibility:hidden]">
+          <span className="mb-stack-md font-label-sm text-label-sm uppercase tracking-widest text-primary-container opacity-80">
             Concept Definition
           </span>
           <h2 className="max-w-md font-body-lg text-display italic text-on-surface">{card.front}</h2>
-          <div className="absolute bottom-stack-md flex items-center gap-unit text-on-surface-variant opacity-40">
+          <div className="absolute bottom-stack-md flex items-center gap-unit text-on-surface-variant opacity-60">
             <MousePointerClick size={18} />
             <span className="font-label-sm text-label-sm">Tap to flip</span>
           </div>
         </div>
 
         {/* Back Side */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center overflow-y-auto rounded-xl border-2 border-socra-sand bg-surface-container-highest p-stack-lg text-center [backface-visibility:hidden] [transform:rotateY(180deg)]">
+        <div className="absolute inset-0 flex flex-col items-center justify-center overflow-y-auto rounded-xl border-2 border-tertiary-container bg-surface-container p-stack-lg text-center [backface-visibility:hidden] [transform:rotateY(180deg)]">
           <span className="mb-stack-md font-label-sm text-label-sm uppercase tracking-widest text-tertiary">
             Socratic Insight
           </span>

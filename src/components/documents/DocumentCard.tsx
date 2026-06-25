@@ -26,10 +26,10 @@ export default function DocumentCard({ document, isActive, onSelect }: DocumentC
 
   return (
     <button
-      className={`group relative flex flex-col rounded-xl p-6 text-left transition-all ${
+      className={`group relative flex flex-col rounded-xl p-6 text-left shadow-sm transition-all ${
         isActive
-          ? 'border border-primary/20 bg-surface-container-high ring-2 ring-primary-container'
-          : 'border border-outline-variant/30 bg-surface-container hover:border-primary/40'
+          ? 'border border-primary/30 bg-white ring-2 ring-primary-container'
+          : 'border border-outline-variant/40 bg-white hover:border-primary/40'
       }`}
       onClick={() => onSelect(document.id)}
       type="button"

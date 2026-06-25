@@ -48,7 +48,7 @@ export default function FlashcardSession({ flashcards }: FlashcardSessionProps) 
             <span className="font-label-sm text-label-sm uppercase tracking-wider">Next review: Tomorrow</span>
           </div>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
           <div
             className="h-full rounded-full bg-primary-container transition-all duration-700 ease-out"
             style={{ width: `${progress}%` }}

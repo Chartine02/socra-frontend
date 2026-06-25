@@ -17,7 +17,7 @@ function TopicRow({ topic }: { topic: KnowledgeUnit }) {
   const { Icon, border, color } = masteryMeta[topic.masteryState]
 
   return (
-    <div className={`flex items-center justify-between rounded-xl border-l-4 bg-surface-container-high p-4 ${border}`}>
+    <div className={`flex items-center justify-between rounded-xl border-l-4 bg-white p-4 shadow-sm ${border}`}>
       <div className="flex items-center gap-3">
         <Icon className={`h-5 w-5 ${color}`} />
         <span className="font-body-md text-body-md text-on-surface">{topic.topic}</span>
@@ -56,7 +56,7 @@ export default function DocumentTopicPanel({ document, onClose }: DocumentTopicP
   ]
 
   return (
-    <aside className="sticky top-20 flex h-[calc(100vh-80px)] w-full flex-col overflow-hidden rounded-tl-3xl border-l border-outline-variant/20 bg-surface-container-low shadow-2xl md:w-[400px]">
+    <aside className="sticky top-20 flex h-[calc(100vh-80px)] w-full flex-col overflow-hidden rounded-tl-3xl border-l border-outline-variant/30 bg-surface-container-low shadow-xl md:w-[400px]">
       <div className="border-b border-outline-variant/10 p-container-margin">
         <div className="mb-stack-md flex items-start justify-between">
           <span className="rounded-full bg-primary-container px-3 py-1 font-label-sm text-label-sm text-on-primary-container">
@@ -79,9 +79,9 @@ export default function DocumentTopicPanel({ document, onClose }: DocumentTopicP
             <h4 className="font-label-lg text-label-lg uppercase tracking-widest text-primary">Mastery Progress</h4>
             <span className="font-headline-md text-headline-md text-on-surface">{document.overallMastery}%</span>
           </div>
-          <div className="h-3 w-full overflow-hidden rounded-full bg-surface-container">
+          <div className="h-3 w-full overflow-hidden rounded-full bg-surface-container-high">
             <div
-              className="h-full rounded-full bg-primary-container shadow-[0_0_10px_rgba(101,109,74,0.4)]"
+              className="h-full rounded-full bg-primary-container shadow-[0_0_10px_rgba(101,109,74,0.2)]"
               style={{ width: `${document.overallMastery}%` }}
             />
           </div>

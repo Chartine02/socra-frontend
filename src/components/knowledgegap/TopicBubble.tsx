@@ -21,7 +21,7 @@ export default function TopicBubble({ node }: TopicBubbleProps) {
 
   return (
     <div
-      className={`topic-card flex flex-col justify-between rounded-xl border-l-4 ${config.border} bg-surface-container-high p-stack-md`}
+      className={`topic-card flex flex-col justify-between rounded-xl border border-outline-variant/30 bg-white p-stack-md shadow-sm`}
     >
       <div className="mb-stack-md">
         <div className="mb-2 flex items-start justify-between">
@@ -36,7 +36,7 @@ export default function TopicBubble({ node }: TopicBubbleProps) {
             <span>Mastery</span>
             <span>{node.masteryPercentage}%</span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-lowest">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
             <div className={`h-full ${config.bar}`} style={{ width: `${node.masteryPercentage}%` }} />
           </div>
         </div>
@@ -44,7 +44,7 @@ export default function TopicBubble({ node }: TopicBubbleProps) {
       <div className="mt-auto flex items-center justify-between">
         <span className="font-label-sm text-label-sm text-outline">Last: {node.lastReviewed ?? '—'}</span>
         <button
-          className="primary-btn-shadow rounded-lg bg-primary-container px-4 py-2 font-label-lg text-label-lg text-on-primary-container"
+          className="rounded-lg bg-primary-container px-4 py-2 font-label-lg text-label-lg text-on-primary-container shadow-sm transition-all hover:brightness-110 active:scale-95"
           type="button"
         >
           Study Now

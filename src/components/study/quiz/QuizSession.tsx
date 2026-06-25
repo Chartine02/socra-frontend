@@ -61,9 +61,9 @@ export default function QuizSession({ questions, streak = 0 }: QuizSessionProps)
             </h2>
             <span className="font-label-sm text-label-sm text-primary">{progress}% Complete</span>
           </div>
-          <div className="h-3 w-full overflow-hidden rounded-full bg-surface-container">
+          <div className="h-3 w-full overflow-hidden rounded-full bg-surface-container-high">
             <div
-              className="h-full rounded-full bg-shaky transition-all duration-500 ease-out"
+              className="h-full rounded-full bg-primary-container transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -90,7 +90,7 @@ export default function QuizSession({ questions, streak = 0 }: QuizSessionProps)
 
         {showFeedback ? (
           <button
-            className="tactile-button w-full rounded-xl bg-primary-container py-5 font-headline-md text-headline-md text-white transition-all"
+            className="tactile-button w-full rounded-xl bg-[#2c3317] py-5 font-headline-md text-headline-md text-white transition-all"
             onClick={handleNext}
             type="button"
           >
@@ -98,7 +98,7 @@ export default function QuizSession({ questions, streak = 0 }: QuizSessionProps)
           </button>
         ) : (
           <button
-            className="tactile-button w-full rounded-xl bg-primary-container py-5 font-headline-md text-headline-md text-white transition-all disabled:cursor-not-allowed disabled:opacity-50"
+            className="tactile-button w-full rounded-xl bg-[#2c3317] py-5 font-headline-md text-headline-md text-white transition-all disabled:cursor-not-allowed disabled:opacity-50"
             disabled={selectedOption === null || !confidence}
             onClick={() => setShowFeedback(true)}
             type="button"

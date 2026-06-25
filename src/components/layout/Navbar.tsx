@@ -19,7 +19,7 @@ export default function Navbar() {
       .toUpperCase() ?? 'S'
 
   return (
-    <nav className="sticky top-0 z-40 bg-socra-darkest/90 backdrop-blur">
+    <nav className="sticky top-0 z-40 bg-surface">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-container-margin py-stack-sm">
         <NavLink className="font-headline-lg text-headline-lg font-bold text-primary" to="/dashboard">
           SOCRA

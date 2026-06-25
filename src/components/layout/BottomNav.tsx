@@ -10,14 +10,14 @@ const items = [
 
 export default function BottomNav() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-socra-forest/20 bg-socra-darkest/95 px-4 py-3 backdrop-blur md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 rounded-t-xl border-t border-outline-variant/30 bg-surface-container px-4 py-3 shadow-lg md:hidden">
       <div className="mx-auto grid max-w-xl grid-cols-4 gap-2">
         {items.map(({ icon: Icon, label, to }) => (
           <NavLink
             key={to}
             className={({ isActive }) =>
               `flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-2 text-xs ${
-                isActive ? 'bg-socra-forest text-socra-darkest' : 'text-socra-tan'
+                isActive ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant'
               }`
             }
             to={to}

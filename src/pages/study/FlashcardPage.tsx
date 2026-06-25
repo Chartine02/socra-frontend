@@ -38,7 +38,7 @@ const sampleFlashcards: Flashcard[] = [
 
 export default function FlashcardPage() {
   return (
-    <div className="socra-shell flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-surface">
       <Navbar />
       <main className="mx-auto mb-20 flex w-full max-w-4xl flex-grow flex-col items-center justify-center px-container-margin py-stack-lg md:mb-0">
         <FlashcardSession flashcards={sampleFlashcards} />
