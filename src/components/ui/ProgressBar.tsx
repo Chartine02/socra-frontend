@@ -1,5 +1,3 @@
-import { formatPercentage } from '../../utils/formatters'
-
 interface ProgressBarProps {
   value: number
   label?: string
@@ -10,15 +8,17 @@ export default function ProgressBar({ label, value }: ProgressBarProps) {
 
   return (
     <div className="flex w-full flex-col gap-2">
-      {(label || Number.isFinite(value)) && (
-        <div className="flex items-center justify-between text-sm text-socra-tan">
+      {label && (
+        <div className="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
           <span>{label}</span>
-          <span>{formatPercentage(safeValue)}</span>
+          <span>{safeValue}%</span>
         </div>
       )}
-      <div className="h-3 overflow-hidden rounded-full bg-socra-darkest">
+      <div className="h-1.5 overflow-hidden rounded-full bg-surface-container-high">
         <div
-          className="h-full rounded-full bg-socra-midbrown transition-all duration-500 ease-out"
+          className={`h-full rounded-full transition-all duration-500 ease-out ${
+            safeValue >= 100 ? 'bg-primary' : 'bg-primary-container'
+          }`}
           style={{ width: `${safeValue}%` }}
         />
       </div>

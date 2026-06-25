@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { PlusCircle } from 'lucide-react'
 import BottomNav from '../components/layout/BottomNav'
 import Navbar from '../components/layout/Navbar'
 import DocumentCard from '../components/documents/DocumentCard'
 import DocumentTopicPanel from '../components/documents/DocumentTopicPanel'
+import { useDocumentUpload } from '../hooks/useDocumentUpload'
 import type { Document } from '../types/document.types'
 
 const sampleDocuments: Document[] = [
@@ -142,10 +143,31 @@ const sampleDocuments: Document[] = [
 export default function DocumentLibraryPage() {
   const [activeId, setActiveId] = useState<string | null>(sampleDocuments[0].id)
   const activeDocument = sampleDocuments.find((document) => document.id === activeId) ?? null
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { mutate: upload } = useDocumentUpload()
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      upload(file)
+    }
+    e.target.value = ''
+  }
 
   return (
     <div className="min-h-screen bg-surface pb-24 md:pb-0">
       <Navbar />
+      <input
+        ref={fileInputRef}
+        accept=".pdf,.docx,.md"
+        className="hidden"
+        onChange={handleFileChange}
+        type="file"
+      />
       <main className="relative mx-auto flex max-w-7xl flex-col gap-stack-lg px-container-margin py-stack-lg md:flex-row">
         <div className="flex-1 transition-all duration-300">
           <header className="mb-stack-lg flex items-end justify-between gap-4">
@@ -157,6 +179,7 @@ export default function DocumentLibraryPage() {
             </div>
             <button
               className="flex items-center gap-2 rounded-xl border-b-4 border-on-secondary-fixed-variant bg-primary-container px-6 py-3 font-label-lg text-label-lg text-on-primary-container shadow-xl transition-all hover:brightness-110 active:scale-95"
+              onClick={handleUploadClick}
               type="button"
             >
               <PlusCircle className="h-5 w-5" />

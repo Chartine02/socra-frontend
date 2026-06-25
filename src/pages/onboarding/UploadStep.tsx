@@ -1,6 +1,24 @@
+import { useState } from 'react'
 import DocumentUploadZone from '../../components/documents/DocumentUploadZone'
+import { useDocumentUpload } from '../../hooks/useDocumentUpload'
+import { useDocumentStore } from '../../store/documentStore'
 
 export default function UploadStep() {
+  const { mutate: upload, reset } = useDocumentUpload()
+  const { isUploading, uploadProgress } = useDocumentStore()
+  const [selectedFileName, setSelectedFileName] = useState<string | undefined>()
+
+  const handleFileSelect = (file: File) => {
+    setSelectedFileName(file.name)
+    upload(file)
+  }
+
+  const handleCancel = () => {
+    reset()
+    useDocumentStore.getState().setUploadProgress(0)
+    setSelectedFileName(undefined)
+  }
+
   return (
     <div className="space-y-stack-lg">
       {/* Hero / Intro */}
@@ -12,7 +30,13 @@ export default function UploadStep() {
       </div>
 
       {/* Upload Canvas */}
-      <DocumentUploadZone />
+      <DocumentUploadZone
+        fileName={selectedFileName}
+        isUploading={isUploading}
+        onCancel={handleCancel}
+        onFileSelect={handleFileSelect}
+        progress={uploadProgress}
+      />
 
       {/* Feature Highlights */}
       <div className="mt-stack-lg grid grid-cols-1 gap-stack-md md:grid-cols-2">
