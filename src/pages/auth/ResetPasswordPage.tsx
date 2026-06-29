@@ -53,7 +53,7 @@ export default function ResetPasswordPage() {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      await authService.resetPassword({ token, password: values.password })
+      await authService.resetPassword({ token, newPassword: values.password })
       setSuccess(true)
     } catch (error) {
       setError('root', {

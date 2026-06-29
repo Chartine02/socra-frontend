@@ -2,7 +2,8 @@ import axios from 'axios'
 import { useAuthStore } from '../store/authStore'
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
+  headers: { 'Content-Type': 'application/json' },
 })
 
 api.interceptors.request.use((config) => {
@@ -20,13 +21,13 @@ api.interceptors.response.use(
   (error: unknown) => {
     const isAxiosError = axios.isAxiosError(error)
     const statusCode = isAxiosError ? error.response?.status : undefined
+    const responseData = isAxiosError && error.response?.data
     const message =
-      (isAxiosError &&
-        typeof error.response?.data === 'object' &&
-        error.response?.data !== null &&
-        'message' in error.response.data &&
-        typeof error.response.data.message === 'string' &&
-        error.response.data.message) ||
+      (responseData &&
+        typeof responseData === 'object' &&
+        'message' in responseData &&
+        typeof responseData.message === 'string' &&
+        responseData.message) ||
       (error instanceof Error ? error.message : 'Unexpected API error')
 
     if (statusCode === 401) {
@@ -40,3 +41,8 @@ api.interceptors.response.use(
     return Promise.reject(new Error(message))
   },
 )
+
+/** Unwrap the backend's standard `{ success, data, message }` envelope. */
+export function unwrap<T>(response: { data: { success: boolean; data: T; message?: string } }): T {
+  return response.data.data
+}

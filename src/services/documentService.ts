@@ -1,11 +1,16 @@
 import type { AxiosProgressEvent } from 'axios'
-import { api } from './api'
+import { api, unwrap } from './api'
 import type { Document, DocumentUploadResponse } from '../types/document.types'
 
 export const documentService = {
   async fetchDocuments(): Promise<Document[]> {
-    const { data } = await api.get<Document[]>('/documents')
-    return data
+    const response = await api.get('/documents')
+    return unwrap<Document[]>(response)
+  },
+
+  async fetchDocument(documentId: string): Promise<Document> {
+    const response = await api.get(`/documents/${documentId}`)
+    return unwrap<Document>(response)
   },
 
   async uploadDocument(
@@ -15,14 +20,14 @@ export const documentService = {
     const formData = new FormData()
     formData.append('file', file)
 
-    const { data } = await api.post<DocumentUploadResponse>('/documents', formData, {
+    const response = await api.post('/documents', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
       onUploadProgress,
     })
 
-    return data
+    return unwrap<DocumentUploadResponse>(response)
   },
 
   async deleteDocument(documentId: string): Promise<void> {

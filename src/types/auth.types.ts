@@ -7,6 +7,9 @@ export interface User {
   avatarUrl?: string
   emailVerified: boolean
   onboardingCompleted: boolean
+  role?: string
+  studyStreak?: number
+  lastStudiedAt?: string
 }
 
 export interface AuthState {
@@ -34,7 +37,7 @@ export interface ForgotPasswordPayload {
 
 export interface ResetPasswordPayload {
   token: string
-  password: string
+  newPassword: string
 }
 
 export interface AuthResponse {

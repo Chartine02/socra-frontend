@@ -1,61 +1,34 @@
-import { api } from './api'
+import { api, unwrap } from './api'
 import type {
   AuthResponse,
   ForgotPasswordPayload,
   LoginCredentials,
   ResetPasswordPayload,
   SignUpPayload,
+  User,
 } from '../types/auth.types'
-
-// Temporary demo account for use until the backend is integrated.
-export const DEMO_CREDENTIALS = {
-  email: 'demo@socra.rw',
-  password: 'socra1234',
-}
-
-const demoUser: AuthResponse['user'] = {
-  id: 'demo-user',
-  fullName: 'Demo Scholar',
-  email: DEMO_CREDENTIALS.email,
-  university: 'African Leadership University (ALU)',
-  courseOfStudy: 'Software Engineering',
-  emailVerified: true,
-  onboardingCompleted: true,
-}
-
-const demoResponse: AuthResponse = {
-  user: demoUser,
-  token: 'demo-token',
-}
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const authService = {
   async signIn(payload: LoginCredentials): Promise<AuthResponse> {
-    if (
-      payload.email.trim().toLowerCase() === DEMO_CREDENTIALS.email &&
-      payload.password === DEMO_CREDENTIALS.password
-    ) {
-      await delay(400)
-      return demoResponse
-    }
-
-    const { data } = await api.post<AuthResponse>('/auth/signin', payload)
-    return data
+    const response = await api.post('/auth/login', payload)
+    return unwrap<AuthResponse>(response)
   },
 
-  async signUp(payload: SignUpPayload): Promise<AuthResponse> {
-    const { data } = await api.post<AuthResponse>('/auth/signup', payload)
-    return data
+  async signUp(payload: SignUpPayload): Promise<{ user: User }> {
+    const response = await api.post('/auth/register', payload)
+    return unwrap<{ user: User }>(response)
   },
 
-  async forgotPassword(payload: ForgotPasswordPayload): Promise<{ message: string }> {
-    const { data } = await api.post<{ message: string }>('/auth/forgot-password', payload)
-    return data
+  async getMe(): Promise<User> {
+    const response = await api.get('/auth/me')
+    return unwrap<User>(response)
   },
 
-  async resetPassword(payload: ResetPasswordPayload): Promise<{ message: string }> {
-    const { data } = await api.post<{ message: string }>('/auth/reset-password', payload)
-    return data
+  async forgotPassword(payload: ForgotPasswordPayload): Promise<void> {
+    await api.post('/auth/forgot-password', payload)
+  },
+
+  async resetPassword(payload: ResetPasswordPayload): Promise<void> {
+    await api.post('/auth/reset-password', payload)
   },
 }

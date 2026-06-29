@@ -1,39 +1,92 @@
-import { api } from './api'
-import type { DialogueTurn, Flashcard, QuizQuestion, StudyMode, StudySession } from '../types/study.types'
+import { api, unwrap } from './api'
+import type { ConfidenceRating, DialogueTurn, Flashcard, QuizQuestion, SelfRating, StudyMode, StudySession } from '../types/study.types'
 
-export interface SocraticSessionResponse {
-  session: StudySession
-  turns: DialogueTurn[]
+export interface StartDialogueResponse {
+  question: string
+  bloomLevel: string
 }
 
-export interface QuizSessionResponse {
-  session: StudySession
-  questions: QuizQuestion[]
+export interface DialogueResponse {
+  response: string
+  bloomLevel: string
+  isSessionComplete: boolean
 }
 
-export interface FlashcardSessionResponse {
-  session: StudySession
-  flashcards: Flashcard[]
+export interface QuizGenerateResponse {
+  id: string
+  questionText: string
+  options: string[]
+  bloomLevel: string
+}
+
+export interface QuizAnswerResponse {
+  isCorrect: boolean
+  correctIndex: number
+  explanation: string
+  sourceExcerpt: string
 }
 
 export const studyService = {
-  async startSession(documentId: string, mode: StudyMode): Promise<StudySession> {
-    const { data } = await api.post<StudySession>('/study/sessions', { documentId, mode })
-    return data
+  // Sessions
+  async createSession(documentId: string, mode: StudyMode): Promise<StudySession> {
+    const response = await api.post('/study/sessions', { documentId, mode: mode.toUpperCase() })
+    return unwrap<StudySession>(response)
   },
 
-  async fetchSocraticSession(documentId: string): Promise<SocraticSessionResponse> {
-    const { data } = await api.get<SocraticSessionResponse>(`/study/socratic/${documentId}`)
-    return data
+  async endSession(sessionId: string, payload: { endedAt: string; itemsCompleted: number; scorePercent?: number }): Promise<void> {
+    await api.patch(`/study/sessions/${sessionId}`, payload)
   },
 
-  async fetchQuizSession(documentId: string): Promise<QuizSessionResponse> {
-    const { data } = await api.get<QuizSessionResponse>(`/study/quiz/${documentId}`)
-    return data
+  // Socratic
+  async startDialogue(sessionId: string, documentId: string): Promise<StartDialogueResponse> {
+    const response = await api.post('/study/socratic/start', { sessionId, documentId })
+    return unwrap<StartDialogueResponse>(response)
   },
 
-  async fetchFlashcardSession(documentId: string): Promise<FlashcardSessionResponse> {
-    const { data } = await api.get<FlashcardSessionResponse>(`/study/flashcard/${documentId}`)
-    return data
+  async sendSocraticResponse(sessionId: string, content: string, currentBloomLevel: string): Promise<DialogueResponse> {
+    const response = await api.post('/study/socratic/respond', { sessionId, content, currentBloomLevel })
+    return unwrap<DialogueResponse>(response)
+  },
+
+  // Quiz
+  async generateQuiz(sessionId: string, documentId: string, count = 10): Promise<QuizGenerateResponse[]> {
+    const response = await api.post('/study/quiz/generate', { sessionId, documentId, count })
+    return unwrap<QuizGenerateResponse[]>(response)
+  },
+
+  async submitQuizAnswer(payload: {
+    sessionId: string
+    questionId: string
+    selectedIndex: number
+    confidenceRating: ConfidenceRating
+    timeTakenSeconds: number
+  }): Promise<QuizAnswerResponse> {
+    const response = await api.post('/study/quiz/respond', {
+      sessionId: payload.sessionId,
+      questionId: payload.questionId,
+      selectedIndex: payload.selectedIndex,
+      confidenceRating: payload.confidenceRating.toUpperCase(),
+      timeTakenSeconds: payload.timeTakenSeconds,
+    })
+    return unwrap<QuizAnswerResponse>(response)
+  },
+
+  // Flashcards
+  async generateFlashcards(documentId: string): Promise<Flashcard[]> {
+    const response = await api.post('/flashcard/generate', { documentId })
+    return unwrap<Flashcard[]>(response)
+  },
+
+  async submitFlashcardReview(flashcardId: string, rating: SelfRating): Promise<Flashcard> {
+    const response = await api.post('/flashcard/review', {
+      flashcardId,
+      rating: rating.toUpperCase(),
+    })
+    return unwrap<Flashcard>(response)
+  },
+
+  async getFlashcards(documentId: string): Promise<Flashcard[]> {
+    const response = await api.get(`/flashcard/${documentId}`)
+    return unwrap<Flashcard[]>(response)
   },
 }

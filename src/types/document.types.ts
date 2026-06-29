@@ -10,17 +10,24 @@ export interface KnowledgeUnit {
   masteryPercentage: number
 }
 
+export type ProcessingStatus = 'PROCESSING' | 'READY' | 'ERROR'
+
 export interface Document {
   id: string
   fileName: string
+  fileSize?: number
+  mimeType?: string
   uploadedAt: Date
   knowledgeUnits: KnowledgeUnit[]
   overallMastery: number
   lastStudied: Date | null
-  processingStatus: 'processing' | 'ready' | 'error'
+  processingStatus: ProcessingStatus
 }
 
 export interface DocumentUploadResponse {
-  document: Document
-  extractedTopics: KnowledgeUnit[]
+  id: string
+  fileName: string
+  fileSize: number
+  mimeType: string
+  processingStatus: ProcessingStatus
 }

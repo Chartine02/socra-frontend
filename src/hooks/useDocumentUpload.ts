@@ -4,7 +4,6 @@ import { useDocumentStore } from '../store/documentStore'
 
 export function useDocumentUpload() {
   const queryClient = useQueryClient()
-  const addDocument = useDocumentStore((state) => state.addDocument)
   const setUploadProgress = useDocumentStore((state) => state.setUploadProgress)
 
   return useMutation({
@@ -14,8 +13,8 @@ export function useDocumentUpload() {
         const progress = total > 0 ? Math.round(((event.loaded ?? 0) / total) * 100) : 0
         setUploadProgress(progress)
       }),
-    onSuccess: (response) => {
-      addDocument(response.document)
+    onSuccess: () => {
+      setUploadProgress(100)
       queryClient.invalidateQueries({ queryKey: ['documents'] })
     },
     onError: () => {

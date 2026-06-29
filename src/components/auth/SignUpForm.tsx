@@ -6,7 +6,6 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { authService } from '../../services/authService'
-import { useAuth } from '../../hooks/useAuth'
 import { RWANDAN_UNIVERSITIES } from '../../utils/constants'
 import Spinner from '../ui/Spinner'
 import type { SignUpPayload } from '../../types/auth.types'
@@ -20,7 +19,6 @@ const signUpSchema = z.object({
 
 export default function SignUpForm() {
   const navigate = useNavigate()
-  const { setToken, setUser } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const {
     formState: { errors },
@@ -35,10 +33,8 @@ export default function SignUpForm() {
 
   const mutation = useMutation({
     mutationFn: authService.signUp,
-    onSuccess: (response) => {
-      setUser(response.user)
-      setToken(response.token)
-      navigate('/onboarding/profile', { replace: true })
+    onSuccess: () => {
+      navigate('/signin', { replace: true })
     },
   })
 

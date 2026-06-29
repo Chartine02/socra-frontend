@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { authService, DEMO_CREDENTIALS } from '../../services/authService'
+import { authService } from '../../services/authService'
 import { useAuth } from '../../hooks/useAuth'
 import Spinner from '../ui/Spinner'
 import type { LoginCredentials } from '../../types/auth.types'
@@ -24,7 +24,6 @@ export default function SignInForm() {
     formState: { errors },
     handleSubmit,
     register,
-    setValue,
   } = useForm<LoginCredentials>({
     resolver: zodResolver(signInSchema),
   })
@@ -95,20 +94,6 @@ export default function SignInForm() {
           >
             {mutation.isPending ? <Spinner size="sm" /> : null}
             Sign In
-          </button>
-
-          <button
-            className="w-full rounded-lg border border-dashed border-outline/40 bg-surface-container/40 px-4 py-3 text-left transition-colors hover:border-primary/50"
-            onClick={() => {
-              setValue('email', DEMO_CREDENTIALS.email)
-              setValue('password', DEMO_CREDENTIALS.password)
-            }}
-            type="button"
-          >
-            <p className="font-label-sm uppercase tracking-wider text-tertiary">Demo account — tap to fill</p>
-            <p className="mt-1 font-body-md text-on-surface-variant">
-              {DEMO_CREDENTIALS.email} / {DEMO_CREDENTIALS.password}
-            </p>
           </button>
         </form>
 

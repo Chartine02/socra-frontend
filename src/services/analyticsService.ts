@@ -1,24 +1,61 @@
-import { api } from './api'
-import type { GapMapData, RetentionMetric, RetentionStateBreakdown, SessionSummary } from '../types/analytics.types'
+import { api, unwrap } from './api'
+import type { GapMapNode, SessionSummary } from '../types/analytics.types'
+
+export interface KnowledgeGapResponse {
+  topics: GapMapNode[]
+}
+
+export interface RetentionCurvePoint {
+  date: string
+  averageMastery: number
+}
+
+export interface StreakResponse {
+  currentStreak: number
+  lastStudiedAt: string | null
+}
+
+export interface DashboardSummary {
+  totalDocuments: number
+  totalTopics: number
+  masteredTopics: number
+  shakyTopics: number
+  forgottenTopics: number
+  overallMasteryPercent: number
+  currentStreak: number
+  totalStudySessionsCount: number
+}
 
 export const analyticsService = {
-  async fetchGapMap(documentId: string): Promise<GapMapData> {
-    const { data } = await api.get<GapMapData>(`/analytics/gap-map/${documentId}`)
-    return data
+  async fetchKnowledgeGap(documentId?: string): Promise<KnowledgeGapResponse> {
+    const params = documentId ? `?documentId=${documentId}` : ''
+    const response = await api.get(`/analytics/knowledge-gap${params}`)
+    return unwrap<KnowledgeGapResponse>(response)
   },
 
-  async fetchRetentionMetrics(): Promise<RetentionMetric[]> {
-    const { data } = await api.get<RetentionMetric[]>('/analytics/retention-metrics')
-    return data
-  },
-
-  async fetchRetentionBreakdown(): Promise<RetentionStateBreakdown[]> {
-    const { data } = await api.get<RetentionStateBreakdown[]>('/analytics/retention-breakdown')
-    return data
+  async fetchRetentionCurve(documentId?: string): Promise<{ points: RetentionCurvePoint[] }> {
+    const params = documentId ? `?documentId=${documentId}` : ''
+    const response = await api.get(`/analytics/retention-curve${params}`)
+    return unwrap<{ points: RetentionCurvePoint[] }>(response)
   },
 
   async fetchSessionHistory(): Promise<SessionSummary[]> {
-    const { data } = await api.get<SessionSummary[]>('/analytics/sessions')
-    return data
+    const response = await api.get('/analytics/sessions')
+    return unwrap<SessionSummary[]>(response)
+  },
+
+  async fetchSessionDetail(sessionId: string) {
+    const response = await api.get(`/analytics/sessions/${sessionId}`)
+    return unwrap(response)
+  },
+
+  async fetchStreak(): Promise<StreakResponse> {
+    const response = await api.get('/analytics/streak')
+    return unwrap<StreakResponse>(response)
+  },
+
+  async fetchDashboardSummary(): Promise<DashboardSummary> {
+    const response = await api.get('/analytics/summary')
+    return unwrap<DashboardSummary>(response)
   },
 }
