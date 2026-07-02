@@ -1,26 +1,160 @@
-import { BookOpen, X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { BookOpen, Loader2, X } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
 import SocraticSession from '../../components/study/socratic/SocraticSession'
+import { studyService } from '../../services/studyService'
+import { useSessionStore } from '../../store/sessionStore'
 import { BLOOM_LABELS } from '../../utils/constants'
-import type { BloomLevel, DialogueTurn } from '../../types/study.types'
+import type { BloomLevel } from '../../types/study.types'
 
-const COURSE_TITLE = 'Introduction to Economics'
-
-const TAXONOMY_LEVELS: BloomLevel[] = ['remember', 'understand', 'apply', 'analyse']
-
-const sampleTurns: DialogueTurn[] = [
-  {
-    id: 'turn-1',
-    role: 'ai',
-    content: 'Based on the text, why is scarcity the fundamental problem of economics?',
-    bloomLevel: 'understand',
-    timestamp: new Date(),
-  },
-]
+const TAXONOMY_LEVELS: BloomLevel[] = ['remember', 'understand', 'apply', 'analyse', 'evaluate', 'create']
 
 export default function SocraticPage() {
+  const { documentId } = useParams<{ documentId: string }>()
   const navigate = useNavigate()
-  const currentBloomLevel: BloomLevel = 'understand'
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const {
+    backendSessionId,
+    currentBloomLevel,
+    dialogueTurns,
+    isSessionComplete,
+    isAiTyping,
+    setBackendSessionId,
+    setCurrentDocumentId,
+    setMode,
+    setBloomLevel,
+    addDialogueTurn,
+    setIsSessionComplete,
+    setIsAiTyping,
+    incrementItems,
+    itemsCompleted,
+    resetSession,
+  } = useSessionStore()
+
+  const initSession = useCallback(async () => {
+    if (!documentId) return
+    try {
+      setLoading(true)
+      setError(null)
+
+      const session = await studyService.createSession(documentId, 'socratic')
+      setBackendSessionId(session.id)
+      setCurrentDocumentId(documentId)
+      setMode('socratic')
+
+      // Start the dialogue
+      const opening = await studyService.startDialogue(session.id, documentId)
+      const bloomLevel = opening.bloomLevel.toLowerCase() as BloomLevel
+      setBloomLevel(bloomLevel)
+      addDialogueTurn({
+        id: `ai-${Date.now()}`,
+        role: 'ai',
+        content: opening.question,
+        bloomLevel,
+        timestamp: new Date(),
+      })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start Socratic session')
+    } finally {
+      setLoading(false)
+    }
+  }, [documentId, setBackendSessionId, setCurrentDocumentId, setMode, setBloomLevel, addDialogueTurn])
+
+  useEffect(() => {
+    initSession()
+  }, [initSession])
+
+  const handleSendMessage = async (content: string) => {
+    if (!backendSessionId || !content.trim()) return
+
+    // Add student turn
+    addDialogueTurn({
+      id: `student-${Date.now()}`,
+      role: 'student',
+      content,
+      bloomLevel: currentBloomLevel,
+      timestamp: new Date(),
+    })
+    incrementItems()
+    setIsAiTyping(true)
+
+    try {
+      const response = await studyService.sendSocraticResponse(
+        backendSessionId,
+        content,
+        currentBloomLevel.toUpperCase(),
+      )
+
+      const newBloomLevel = response.bloomLevel.toLowerCase() as BloomLevel
+      setBloomLevel(newBloomLevel)
+
+      addDialogueTurn({
+        id: `ai-${Date.now()}`,
+        role: 'ai',
+        content: response.response,
+        bloomLevel: newBloomLevel,
+        timestamp: new Date(),
+      })
+
+      if (response.isSessionComplete) {
+        setIsSessionComplete(true)
+      }
+    } catch {
+      addDialogueTurn({
+        id: `error-${Date.now()}`,
+        role: 'ai',
+        content: 'Sorry, I encountered an error. Please try again.',
+        bloomLevel: currentBloomLevel,
+        timestamp: new Date(),
+      })
+    } finally {
+      setIsAiTyping(false)
+    }
+  }
+
+  const handleEndSession = async () => {
+    if (backendSessionId) {
+      try {
+        await studyService.endSession(backendSessionId, {
+          endedAt: new Date().toISOString(),
+          itemsCompleted,
+          finalBloomLevel: currentBloomLevel.toUpperCase(),
+        })
+      } catch {
+        // best-effort
+      }
+    }
+    resetSession()
+    navigate(`/documents/${documentId}`)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-surface">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-on-surface-variant">Starting Socratic dialogue...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-surface px-4">
+        <p className="text-error">{error}</p>
+        <button
+          className="rounded-lg bg-primary-container px-4 py-2 text-on-primary-container"
+          onClick={() => navigate(`/documents/${documentId}`)}
+          type="button"
+        >
+          Back to Document
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden bg-surface font-body-md text-body-md text-on-surface">
@@ -30,7 +164,7 @@ export default function SocraticPage() {
           <span className="font-headline-md text-headline-md font-bold tracking-tight text-primary">SOCRA</span>
           <div className="h-4 w-px bg-outline-variant" />
           <span className="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant">
-            {COURSE_TITLE}
+            Socratic Dialogue
           </span>
         </div>
         <div className="flex items-center gap-stack-lg">
@@ -55,7 +189,7 @@ export default function SocraticPage() {
           </div>
           <button
             className="flex items-center gap-2 px-4 py-2 font-label-lg text-label-lg text-on-surface transition-colors hover:text-primary"
-            onClick={() => navigate(-1)}
+            onClick={handleEndSession}
             type="button"
           >
             <X size={20} />
@@ -66,52 +200,43 @@ export default function SocraticPage() {
 
       {/* Main Content Area */}
       <main className="flex flex-grow flex-col overflow-hidden md:flex-row">
-        {/* Left Column: Document Excerpt */}
-        <section className="flex w-full justify-center overflow-y-auto bg-socra-dark px-container-margin py-stack-lg md:w-1/2">
+        {/* Left Column: Info */}
+        <section className="hidden w-full justify-center overflow-y-auto bg-socra-dark px-container-margin py-stack-lg md:flex md:w-1/2">
           <div className="reading-lane">
             <div className="mb-stack-md flex items-center gap-2">
               <BookOpen className="text-primary" size={20} />
-              <span className="font-label-lg text-label-lg uppercase text-primary">Reference Material</span>
+              <span className="font-label-lg text-label-lg uppercase text-primary">Dialogue Info</span>
             </div>
             <div className="prose prose-invert">
               <p className="mb-stack-md font-body-lg text-body-lg leading-relaxed text-socra-stone">
-                At its core,{' '}
-                <span className="border-b border-primary bg-primary-container/40 px-1 text-on-primary-container">
-                  economics is the study of scarcity
-                </span>{' '}
-                and its implications for the use of resources, production of goods and services, growth of production and
-                welfare over time, and a great variety of other complex issues of vital concern to society.
+                This AI-guided Socratic dialogue will progressively climb Bloom's taxonomy,
+                starting from <strong>Remember</strong> and working up to <strong>Create</strong>.
               </p>
               <p className="mb-stack-md font-body-lg text-body-lg leading-relaxed text-socra-stone">
-                The fundamental problem of economics is the{' '}
-                <span className="border-b border-primary bg-primary-container/40 px-1 text-on-primary-container">
-                  scarcity of resources
-                </span>
-                . Human wants and needs are virtually infinite, but the resources needed to satisfy those wants—land,
-                labor, and capital—are strictly limited. This imbalance necessitates choice.
+                Engage thoughtfully with each question. The AI will adapt its questions based
+                on your responses and guide you toward deeper understanding.
               </p>
-              <p className="font-body-lg text-body-lg leading-relaxed text-socra-stone">
-                Because we cannot have everything we want, we must decide which goals are most important and allocate
-                resources accordingly. Every choice involves an opportunity cost: the value of the next best alternative
-                foregone.
-              </p>
-            </div>
-            <div className="mt-12 rounded-xl border border-outline-variant/20 bg-surface-container-low/30 p-stack-md">
-              <span className="font-label-sm text-label-sm italic text-on-surface-variant">
-                Note: Consider how the text links 'infinite wants' to 'finite means'.
-              </span>
+              {isSessionComplete && (
+                <div className="mt-8 rounded-xl border border-primary-container/30 bg-primary-container/10 p-4">
+                  <p className="font-label-lg text-primary">
+                    Session complete! You reached the <strong>{BLOOM_LABELS[currentBloomLevel]}</strong> level.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </section>
 
         {/* Right Column: Socratic Dialogue */}
-        <SocraticSession currentBloomLevel={currentBloomLevel} turns={sampleTurns} />
+        <SocraticSession
+          currentBloomLevel={currentBloomLevel}
+          turns={dialogueTurns}
+          isAiTyping={isAiTyping}
+          isSessionComplete={isSessionComplete}
+          onSendMessage={handleSendMessage}
+          onEndSession={handleEndSession}
+        />
       </main>
-
-      {/* Visual Polish: Soft Glow Effect in Background */}
-      <div className="pointer-events-none fixed right-0 top-0 z-0 h-full w-1/2 overflow-hidden opacity-20">
-        <div className="absolute -right-1/4 -top-1/4 h-[600px] w-[600px] rounded-full bg-primary-container/20 blur-[120px]" />
-      </div>
     </div>
   )
 }

@@ -7,6 +7,7 @@ import ResetPasswordPage from '../pages/auth/ResetPasswordPage'
 import SignInPage from '../pages/auth/SignInPage'
 import SignUpPage from '../pages/auth/SignUpPage'
 import DashboardPage from '../pages/DashboardPage'
+import DocumentDetailPage from '../pages/DocumentDetailPage'
 import DocumentLibraryPage from '../pages/DocumentLibraryPage'
 import KnowledgeGapPage from '../pages/KnowledgeGapPage'
 import LandingPage from '../pages/LandingPage'
@@ -81,6 +82,10 @@ export const router = createBrowserRouter([
       {
         path: '/documents',
         element: <DocumentLibraryPage />,
+      },
+      {
+        path: '/documents/:documentId',
+        element: <DocumentDetailPage />,
       },
       {
         path: '/knowledge-gap',

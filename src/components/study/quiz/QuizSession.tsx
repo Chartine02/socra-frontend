@@ -1,33 +1,91 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Flame, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import type { ConfidenceRating as ConfidenceRatingType, QuizQuestion } from '../../../types/study.types'
+import type { ConfidenceRating as ConfidenceRatingType, QuizQuestion, QuizResult } from '../../../types/study.types'
+import { studyService } from '../../../services/studyService'
+import { useSessionStore } from '../../../store/sessionStore'
 import ConfidenceRating from './ConfidenceRating'
 import QuestionCard from './QuestionCard'
 import QuizFeedback from './QuizFeedback'
 
 interface QuizSessionProps {
   questions: QuizQuestion[]
-  streak?: number
+  sessionId: string
+  onSessionEnd?: (scorePercent: number, itemsCompleted: number) => void
 }
 
-export default function QuizSession({ questions, streak = 0 }: QuizSessionProps) {
+export default function QuizSession({ questions, sessionId, onSessionEnd }: QuizSessionProps) {
   const navigate = useNavigate()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
   const [confidence, setConfidence] = useState<ConfidenceRatingType | undefined>()
   const [showFeedback, setShowFeedback] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [currentFeedback, setCurrentFeedback] = useState<{ isCorrect: boolean; correctIndex: number; explanation: string; sourceExcerpt: string } | null>(null)
+  const [results, setResults] = useState<QuizResult[]>([])
+  const [streak, setStreak] = useState(0)
+  const questionStartTime = useRef(Date.now())
+  const { incrementItems } = useSessionStore()
 
   const total = questions.length
   const question = questions[currentIndex]
   const isLast = currentIndex === total - 1
   const progress = Math.round(((currentIndex + (showFeedback ? 1 : 0)) / total) * 100)
-  const isCorrect = selectedOption === question.correctOptionIndex
+
+  const handleSubmitAnswer = async () => {
+    if (selectedOption === null || !confidence || isSubmitting) return
+    setIsSubmitting(true)
+
+    const timeTakenSeconds = Math.round((Date.now() - questionStartTime.current) / 1000)
+
+    try {
+      const response = await studyService.submitQuizAnswer({
+        sessionId,
+        questionId: question.id,
+        selectedIndex: selectedOption,
+        confidenceRating: confidence,
+        timeTakenSeconds,
+      })
+
+      setCurrentFeedback(response)
+      setShowFeedback(true)
+      incrementItems()
+
+      const result: QuizResult = {
+        questionId: question.id,
+        isCorrect: response.isCorrect,
+        correctIndex: response.correctIndex,
+        explanation: response.explanation,
+        sourceExcerpt: response.sourceExcerpt,
+        selectedIndex: selectedOption,
+        confidence,
+      }
+      setResults((prev) => [...prev, result])
+
+      if (response.isCorrect) {
+        setStreak((s) => s + 1)
+      } else {
+        setStreak(0)
+      }
+    } catch {
+      // If submission fails, show basic feedback
+      setCurrentFeedback({
+        isCorrect: false,
+        correctIndex: -1,
+        explanation: 'Failed to submit answer. Please try again.',
+        sourceExcerpt: '',
+      })
+      setShowFeedback(true)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const handleNext = () => {
     if (isLast) {
-      navigate('/session/summary')
-
+      const correctCount = results.filter((r) => r.isCorrect).length
+      const scorePercent = Math.round((correctCount / total) * 100)
+      onSessionEnd?.(scorePercent, total)
       return
     }
 
@@ -35,7 +93,11 @@ export default function QuizSession({ questions, streak = 0 }: QuizSessionProps)
     setSelectedOption(null)
     setConfidence(undefined)
     setShowFeedback(false)
+    setCurrentFeedback(null)
+    questionStartTime.current = Date.now()
   }
+
+  if (!question) return null
 
   return (
     <div className="flex w-full flex-grow flex-col">
@@ -75,14 +137,15 @@ export default function QuizSession({ questions, streak = 0 }: QuizSessionProps)
         selectedOption={selectedOption}
         onSelect={setSelectedOption}
         showFeedback={showFeedback}
+        correctIndex={currentFeedback?.correctIndex}
       />
 
       <footer className="mt-stack-lg w-full space-y-stack-lg">
-        {showFeedback ? (
+        {showFeedback && currentFeedback ? (
           <QuizFeedback
-            explanation={question.explanation}
-            isCorrect={isCorrect}
-            sourceExcerpt={question.sourceExcerpt}
+            explanation={currentFeedback.explanation}
+            isCorrect={currentFeedback.isCorrect}
+            sourceExcerpt={currentFeedback.sourceExcerpt}
           />
         ) : (
           <ConfidenceRating value={confidence} onChange={setConfidence} />
@@ -99,11 +162,11 @@ export default function QuizSession({ questions, streak = 0 }: QuizSessionProps)
         ) : (
           <button
             className="tactile-button w-full rounded-xl bg-[#2c3317] py-5 font-headline-md text-headline-md text-white transition-all disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={selectedOption === null || !confidence}
-            onClick={() => setShowFeedback(true)}
+            disabled={selectedOption === null || !confidence || isSubmitting}
+            onClick={handleSubmitAnswer}
             type="button"
           >
-            Check Answer
+            {isSubmitting ? 'Checking...' : 'Check Answer'}
           </button>
         )}
       </footer>

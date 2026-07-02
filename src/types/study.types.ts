@@ -18,10 +18,20 @@ export interface QuizQuestion {
   id: string
   questionText: string
   options: string[]
-  correctOptionIndex: number
+  correctOptionIndex?: number
   bloomLevel: BloomLevel
+  explanation?: string
+  sourceExcerpt?: string
+}
+
+export interface QuizResult {
+  questionId: string
+  isCorrect: boolean
+  correctIndex: number
   explanation: string
   sourceExcerpt: string
+  selectedIndex: number
+  confidence: ConfidenceRating
 }
 
 export interface Flashcard {
@@ -31,7 +41,7 @@ export interface Flashcard {
   sourceExcerpt: string
   interval: number
   easeFactor: number
-  nextReviewDate: Date
+  nextReviewAt: string
   masteryState: MasteryState
 }
 
@@ -47,8 +57,9 @@ export interface StudySession {
   id: string
   documentId: string
   mode: StudyMode
-  startedAt: Date
-  completedAt: Date | null
+  startedAt: string
+  endedAt?: string | null
   itemsCompleted: number
-  currentBloomLevel: BloomLevel
+  finalBloomLevel?: BloomLevel
+  scorePercent?: number
 }

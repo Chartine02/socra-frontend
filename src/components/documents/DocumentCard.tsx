@@ -77,7 +77,7 @@ export default function DocumentCard({ document, isActive, onSelect }: DocumentC
         </span>
         <span className="flex items-center gap-1 font-label-sm text-label-sm text-primary">
           <BookOpen className="h-3.5 w-3.5" />
-          {document.knowledgeUnits.length} Knowledge Units
+          {document.knowledgeUnits?.length ?? 0} Knowledge Units
         </span>
       </div>
 

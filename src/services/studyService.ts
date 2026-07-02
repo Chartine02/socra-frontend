@@ -1,5 +1,5 @@
 import { api, unwrap } from './api'
-import type { ConfidenceRating, DialogueTurn, Flashcard, QuizQuestion, SelfRating, StudyMode, StudySession } from '../types/study.types'
+import type { ConfidenceRating, Flashcard, QuizQuestion, SelfRating, StudyMode, StudySession } from '../types/study.types'
 
 export interface StartDialogueResponse {
   question: string
@@ -10,13 +10,6 @@ export interface DialogueResponse {
   response: string
   bloomLevel: string
   isSessionComplete: boolean
-}
-
-export interface QuizGenerateResponse {
-  id: string
-  questionText: string
-  options: string[]
-  bloomLevel: string
 }
 
 export interface QuizAnswerResponse {
@@ -33,7 +26,12 @@ export const studyService = {
     return unwrap<StudySession>(response)
   },
 
-  async endSession(sessionId: string, payload: { endedAt: string; itemsCompleted: number; scorePercent?: number }): Promise<void> {
+  async endSession(sessionId: string, payload: {
+    endedAt: string
+    itemsCompleted: number
+    scorePercent?: number
+    finalBloomLevel?: string
+  }): Promise<void> {
     await api.patch(`/study/sessions/${sessionId}`, payload)
   },
 
@@ -49,9 +47,9 @@ export const studyService = {
   },
 
   // Quiz
-  async generateQuiz(sessionId: string, documentId: string, count = 10): Promise<QuizGenerateResponse[]> {
+  async generateQuiz(sessionId: string, documentId: string, count = 10): Promise<QuizQuestion[]> {
     const response = await api.post('/study/quiz/generate', { sessionId, documentId, count })
-    return unwrap<QuizGenerateResponse[]>(response)
+    return unwrap<QuizQuestion[]>(response)
   },
 
   async submitQuizAnswer(payload: {
@@ -73,12 +71,12 @@ export const studyService = {
 
   // Flashcards
   async generateFlashcards(documentId: string): Promise<Flashcard[]> {
-    const response = await api.post('/flashcard/generate', { documentId })
+    const response = await api.post('/flashcards/generate', { documentId })
     return unwrap<Flashcard[]>(response)
   },
 
   async submitFlashcardReview(flashcardId: string, rating: SelfRating): Promise<Flashcard> {
-    const response = await api.post('/flashcard/review', {
+    const response = await api.post('/flashcards/review', {
       flashcardId,
       rating: rating.toUpperCase(),
     })
@@ -86,7 +84,7 @@ export const studyService = {
   },
 
   async getFlashcards(documentId: string): Promise<Flashcard[]> {
-    const response = await api.get(`/flashcard/${documentId}`)
+    const response = await api.get(`/flashcards/${documentId}`)
     return unwrap<Flashcard[]>(response)
   },
 }

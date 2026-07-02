@@ -2,6 +2,7 @@ import type { SelfRating } from '../../../types/study.types'
 
 interface SelfRatingButtonsProps {
   onSelect?: (value: SelfRating) => void
+  disabled?: boolean
 }
 
 const ratings: { value: SelfRating; label: string; className: string }[] = [
@@ -11,14 +12,15 @@ const ratings: { value: SelfRating; label: string; className: string }[] = [
   { value: 'easy', label: 'Easy', className: 'bg-[#936639] text-white border-[#7f4f24]' },
 ]
 
-export default function SelfRatingButtons({ onSelect }: SelfRatingButtonsProps) {
+export default function SelfRatingButtons({ onSelect, disabled = false }: SelfRatingButtonsProps) {
   return (
     <div className="flex gap-stack-md">
       {ratings.map(({ value, label, className }) => (
         <button
           key={value}
-          className={`rounded-lg border-b-2 px-gutter py-stack-sm font-label-sm text-label-sm transition-all active:translate-y-px ${className}`}
+          className={`rounded-lg border-b-2 px-gutter py-stack-sm font-label-sm text-label-sm transition-all active:translate-y-px ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           onClick={() => onSelect?.(value)}
+          disabled={disabled}
           type="button"
         >
           {label}

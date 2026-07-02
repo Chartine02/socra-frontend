@@ -89,10 +89,10 @@ export default function DocumentTopicPanel({ document, onClose }: DocumentTopicP
 
         <section>
           <h4 className="mb-stack-md font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant">
-            Knowledge Units ({document.knowledgeUnits.length})
+            Knowledge Units ({document.knowledgeUnits?.length ?? 0})
           </h4>
           <div className="flex flex-col gap-stack-sm">
-            {document.knowledgeUnits.map((topic) => (
+            {(document.knowledgeUnits ?? []).map((topic) => (
               <TopicRow key={topic.id} topic={topic} />
             ))}
           </div>

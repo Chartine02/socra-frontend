@@ -9,9 +9,10 @@ interface QuestionCardProps {
   selectedOption: number | null
   onSelect: (index: number) => void
   showFeedback: boolean
+  correctIndex?: number
 }
 
-export default function QuestionCard({ onSelect, question, selectedOption, showFeedback }: QuestionCardProps) {
+export default function QuestionCard({ onSelect, question, selectedOption, showFeedback, correctIndex }: QuestionCardProps) {
   return (
     <section className="flex w-full flex-grow flex-col space-y-stack-md">
       <div className="space-y-stack-md rounded-xl bg-primary-container p-stack-lg">
@@ -19,15 +20,15 @@ export default function QuestionCard({ onSelect, question, selectedOption, showF
           {BLOOM_LABELS[question.bloomLevel]}
         </span>
         <h1 className="font-body-lg text-headline-md italic leading-relaxed text-white md:text-headline-lg">
-          “{question.questionText}”
+          &ldquo;{question.questionText}&rdquo;
         </h1>
       </div>
       <div className="grid w-full grid-cols-1 gap-stack-md">
         {question.options.map((option, index) => {
           let state: 'correct' | 'incorrect' | null = null
 
-          if (showFeedback) {
-            if (index === question.correctOptionIndex) state = 'correct'
+          if (showFeedback && correctIndex !== undefined) {
+            if (index === correctIndex) state = 'correct'
             else if (index === selectedOption) state = 'incorrect'
           }
 

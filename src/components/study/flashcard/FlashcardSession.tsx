@@ -1,19 +1,26 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Clock, RefreshCw } from 'lucide-react'
 import type { Flashcard as FlashcardType, SelfRating } from '../../../types/study.types'
+import { studyService } from '../../../services/studyService'
+import { useSessionStore } from '../../../store/sessionStore'
 import Flashcard from './Flashcard'
 import SelfRatingButtons from './SelfRatingButtons'
 
 interface FlashcardSessionProps {
   flashcards: FlashcardType[]
+  onSessionEnd?: () => void
 }
 
-export default function FlashcardSession({ flashcards }: FlashcardSessionProps) {
+export default function FlashcardSession({ flashcards, onSessionEnd }: FlashcardSessionProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { incrementItems, updateFlashcard } = useSessionStore()
+
   const total = flashcards.length
   const currentCard = flashcards[currentIndex]
-  const progress = total > 0 ? Math.round((currentIndex / total) * 100) : 0
+  const progress = total > 0 ? Math.round(((currentIndex) / total) * 100) : 0
+  const isLastCard = currentIndex >= total - 1
 
   const flip = useCallback(() => setIsFlipped((value) => !value), [])
 
@@ -30,10 +37,30 @@ export default function FlashcardSession({ flashcards }: FlashcardSessionProps) 
     return () => window.removeEventListener('keydown', handleKeydown)
   }, [flip])
 
-  const handleRate = (_rating: SelfRating) => {
+  const handleRate = async (rating: SelfRating) => {
+    if (isSubmitting) return
+    setIsSubmitting(true)
+
+    try {
+      const updatedCard = await studyService.submitFlashcardReview(currentCard.id, rating)
+      updateFlashcard(updatedCard)
+      incrementItems()
+    } catch {
+      // Continue even if review submission fails
+    } finally {
+      setIsSubmitting(false)
+    }
+
     setIsFlipped(false)
-    setCurrentIndex((value) => Math.min(value + 1, total - 1))
+
+    if (isLastCard) {
+      onSessionEnd?.()
+    } else {
+      setCurrentIndex((value) => value + 1)
+    }
   }
+
+  if (!currentCard) return null
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -41,11 +68,13 @@ export default function FlashcardSession({ flashcards }: FlashcardSessionProps) 
       <div className="mb-stack-lg w-full max-w-[720px] space-y-stack-sm">
         <div className="flex items-end justify-between">
           <h1 className="font-headline-md text-headline-md text-on-surface">
-            {currentIndex + 1} of {total} cards reviewed
+            Card {currentIndex + 1} of {total}
           </h1>
           <div className="flex items-center gap-unit text-on-surface-variant">
             <Clock size={14} />
-            <span className="font-label-sm text-label-sm uppercase tracking-wider">Next review: Tomorrow</span>
+            <span className="font-label-sm text-label-sm uppercase tracking-wider">
+              {currentCard.masteryState}
+            </span>
           </div>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
@@ -69,7 +98,7 @@ export default function FlashcardSession({ flashcards }: FlashcardSessionProps) 
           <RefreshCw size={20} />
           Flip Card
         </button>
-        {isFlipped && <SelfRatingButtons onSelect={handleRate} />}
+        {isFlipped && <SelfRatingButtons onSelect={handleRate} disabled={isSubmitting} />}
       </div>
     </div>
   )

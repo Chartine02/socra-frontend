@@ -1,47 +1,147 @@
+import { useCallback, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { ArrowLeft, CheckCircle, Loader2 } from 'lucide-react'
 import BottomNav from '../../components/layout/BottomNav'
 import Navbar from '../../components/layout/Navbar'
 import FlashcardSession from '../../components/study/flashcard/FlashcardSession'
+import { studyService } from '../../services/studyService'
+import { useSessionStore } from '../../store/sessionStore'
 import type { Flashcard } from '../../types/study.types'
 
-const sampleFlashcards: Flashcard[] = [
-  {
-    id: 'fc-1',
-    front: 'The Scarcity Principle',
-    back: 'The economic theory that limited availability of a resource in the face of high demand creates a mismatch, leading to increased perceived value and competitive behavior.',
-    sourceExcerpt: '"How does the illusion of scarcity affect your decision-making in digital marketplaces?"',
-    interval: 3,
-    easeFactor: 2.5,
-    nextReviewDate: new Date(),
-    masteryState: 'shaky',
-  },
-  {
-    id: 'fc-2',
-    front: 'Opportunity Cost',
-    back: 'The value of the next best alternative that must be given up when a choice is made between competing uses of a limited resource.',
-    sourceExcerpt: '"What did you give up the last time you committed an hour to studying?"',
-    interval: 2,
-    easeFactor: 2.4,
-    nextReviewDate: new Date(),
-    masteryState: 'shaky',
-  },
-  {
-    id: 'fc-3',
-    front: 'Marginal Utility',
-    back: 'The additional satisfaction a consumer gains from consuming one more unit of a good or service, which typically diminishes as consumption increases.',
-    sourceExcerpt: '"Why does the second slice of pizza satisfy you less than the first?"',
-    interval: 4,
-    easeFactor: 2.6,
-    nextReviewDate: new Date(),
-    masteryState: 'mastered',
-  },
-]
-
 export default function FlashcardPage() {
+  const { documentId } = useParams<{ documentId: string }>()
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [allDone, setAllDone] = useState(false)
+
+  const {
+    backendSessionId,
+    flashcards,
+    setBackendSessionId,
+    setCurrentDocumentId,
+    setFlashcards,
+    setMode,
+    resetSession,
+    itemsCompleted,
+  } = useSessionStore()
+
+  const initSession = useCallback(async () => {
+    if (!documentId) return
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Create session
+      const session = await studyService.createSession(documentId, 'flashcard')
+      setBackendSessionId(session.id)
+      setCurrentDocumentId(documentId)
+      setMode('flashcard')
+
+      // Generate/fetch due flashcards
+      const cards = await studyService.generateFlashcards(documentId)
+      if (cards.length === 0) {
+        setAllDone(true)
+      }
+      setFlashcards(cards)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start flashcard session')
+    } finally {
+      setLoading(false)
+    }
+  }, [documentId, setBackendSessionId, setCurrentDocumentId, setFlashcards, setMode])
+
+  useEffect(() => {
+    initSession()
+    return () => {
+      // Don't reset here — we end the session in handleSessionEnd
+    }
+  }, [initSession])
+
+  const handleSessionEnd = async () => {
+    if (backendSessionId) {
+      try {
+        await studyService.endSession(backendSessionId, {
+          endedAt: new Date().toISOString(),
+          itemsCompleted,
+        })
+      } catch {
+        // silently fail — session end is best-effort
+      }
+    }
+    resetSession()
+    navigate(`/documents/${documentId}`)
+  }
+
+  const handleCardReviewed = async (flashcardId: string, rating: Flashcard['masteryState'] extends string ? import('../../types/study.types').SelfRating : never) => {
+    // This is handled inside FlashcardSession now
+    void flashcardId
+    void rating
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen flex-col bg-surface">
+        <Navbar />
+        <main className="flex flex-grow items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-on-surface-variant">Preparing flashcards...</p>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen flex-col bg-surface">
+        <Navbar />
+        <main className="flex flex-grow flex-col items-center justify-center gap-4 px-4">
+          <p className="text-error">{error}</p>
+          <button
+            className="rounded-lg bg-primary-container px-4 py-2 text-on-primary-container"
+            onClick={() => navigate(`/documents/${documentId}`)}
+            type="button"
+          >
+            Back to Document
+          </button>
+        </main>
+      </div>
+    )
+  }
+
+  if (allDone || flashcards.length === 0) {
+    return (
+      <div className="flex min-h-screen flex-col bg-surface">
+        <Navbar />
+        <main className="flex flex-grow flex-col items-center justify-center gap-6 px-4">
+          <CheckCircle className="h-16 w-16 text-primary" />
+          <div className="text-center">
+            <h2 className="font-headline-lg text-headline-lg text-on-surface">All caught up!</h2>
+            <p className="mt-2 text-on-surface-variant">
+              No flashcards due for review right now. Check back later!
+            </p>
+          </div>
+          <button
+            className="flex items-center gap-2 rounded-xl bg-primary-container px-6 py-3 font-label-lg text-on-primary-container"
+            onClick={() => navigate(`/documents/${documentId}`)}
+            type="button"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Document
+          </button>
+        </main>
+        <BottomNav />
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-surface">
       <Navbar />
       <main className="mx-auto mb-20 flex w-full max-w-4xl flex-grow flex-col items-center justify-center px-container-margin py-stack-lg md:mb-0">
-        <FlashcardSession flashcards={sampleFlashcards} />
+        <FlashcardSession flashcards={flashcards} onSessionEnd={handleSessionEnd} />
       </main>
       <BottomNav />
     </div>
