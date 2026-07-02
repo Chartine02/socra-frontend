@@ -4,7 +4,7 @@ import { analyticsService } from '../services/analyticsService'
 export function useKnowledgeGap(documentId: string) {
   return useQuery({
     queryKey: ['knowledge-gap', documentId],
-    queryFn: () => analyticsService.fetchGapMap(documentId),
+    queryFn: () => analyticsService.fetchKnowledgeGap(documentId),
     enabled: Boolean(documentId),
   })
 }

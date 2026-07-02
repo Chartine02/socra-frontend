@@ -6,7 +6,6 @@ import Navbar from '../../components/layout/Navbar'
 import FlashcardSession from '../../components/study/flashcard/FlashcardSession'
 import { studyService } from '../../services/studyService'
 import { useSessionStore } from '../../store/sessionStore'
-import type { Flashcard } from '../../types/study.types'
 
 export default function FlashcardPage() {
   const { documentId } = useParams<{ documentId: string }>()
@@ -71,12 +70,6 @@ export default function FlashcardPage() {
     }
     resetSession()
     navigate(`/documents/${documentId}`)
-  }
-
-  const handleCardReviewed = async (flashcardId: string, rating: Flashcard['masteryState'] extends string ? import('../../types/study.types').SelfRating : never) => {
-    // This is handled inside FlashcardSession now
-    void flashcardId
-    void rating
   }
 
   if (loading) {

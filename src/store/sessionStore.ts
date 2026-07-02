@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { BLOOM_LEVELS } from '../utils/constants'
-import type { BloomLevel, ConfidenceRating, DialogueTurn, Flashcard, QuizQuestion, QuizResult, StudyMode } from '../types/study.types'
+import type { BloomLevel, DialogueTurn, Flashcard, QuizQuestion, QuizResult, StudyMode } from '../types/study.types'
 
 export interface SessionState {
   // Active session

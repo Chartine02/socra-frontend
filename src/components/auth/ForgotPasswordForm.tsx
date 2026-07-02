@@ -56,7 +56,7 @@ export default function ForgotPasswordForm() {
             {errors.email?.message ? <p className="px-1 text-label-sm text-error">{errors.email.message}</p> : null}
           </div>
 
-          {mutation.isSuccess ? <p className="px-1 text-label-sm text-primary">{mutation.data.message}</p> : null}
+          {mutation.isSuccess ? <p className="px-1 text-label-sm text-primary">Reset link sent! Check your email.</p> : null}
           {mutation.error ? <p className="px-1 text-label-sm text-error">{mutation.error.message}</p> : null}
 
           <button
