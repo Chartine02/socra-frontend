@@ -18,14 +18,16 @@ import Navbar from '../components/layout/Navbar'
 import { documentService } from '../services/documentService'
 import type { Document, KnowledgeUnit } from '../types/document.types'
 
-const masteryMeta = {
+const masteryMeta: Record<string, { Icon: typeof CheckCircle2; color: string; bg: string }> = {
   mastered: { Icon: CheckCircle2, color: 'text-primary', bg: 'bg-primary/10' },
   shaky: { Icon: Clock, color: 'text-tertiary', bg: 'bg-tertiary/10' },
   forgotten: { Icon: Circle, color: 'text-error', bg: 'bg-error/10' },
-} as const
+}
+
+const defaultMasteryMeta = { Icon: Circle, color: 'text-on-surface-variant', bg: 'bg-surface-variant/10' }
 
 function KnowledgeUnitRow({ unit }: { unit: KnowledgeUnit }) {
-  const { Icon, bg, color } = masteryMeta[unit.masteryState]
+  const { Icon, bg, color } = masteryMeta[unit.masteryState] ?? defaultMasteryMeta
 
   return (
     <div className={`flex items-center justify-between rounded-xl border border-outline-variant/20 p-4 ${bg}`}>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, CheckCircle, Loader2 } from 'lucide-react'
 import BottomNav from '../../components/layout/BottomNav'
@@ -25,37 +25,46 @@ export default function FlashcardPage() {
     itemsCompleted,
   } = useSessionStore()
 
-  const initSession = useCallback(async () => {
+  useEffect(() => {
     if (!documentId) return
-    try {
-      setLoading(true)
-      setError(null)
 
-      // Create session
-      const session = await studyService.createSession(documentId, 'flashcard')
-      setBackendSessionId(session.id)
-      setCurrentDocumentId(documentId)
-      setMode('flashcard')
+    let cancelled = false
 
-      // Generate/fetch due flashcards
-      const cards = await studyService.generateFlashcards(documentId)
-      if (cards.length === 0) {
-        setAllDone(true)
+    const initSession = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // Create session
+        const session = await studyService.createSession(documentId, 'flashcard')
+        if (cancelled) return
+        setBackendSessionId(session.id)
+        setCurrentDocumentId(documentId)
+        setMode('flashcard')
+
+        // Generate/fetch due flashcards
+        const cards = await studyService.generateFlashcards(documentId)
+        if (cancelled) return
+        if (cards.length === 0) {
+          setAllDone(true)
+        }
+        setFlashcards(cards)
+      } catch (err) {
+        if (cancelled) return
+        setError(err instanceof Error ? err.message : 'Failed to start flashcard session')
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
       }
-      setFlashcards(cards)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start flashcard session')
-    } finally {
-      setLoading(false)
+    }
+
+    initSession()
+
+    return () => {
+      cancelled = true
     }
   }, [documentId, setBackendSessionId, setCurrentDocumentId, setFlashcards, setMode])
-
-  useEffect(() => {
-    initSession()
-    return () => {
-      // Don't reset here — we end the session in handleSessionEnd
-    }
-  }, [initSession])
 
   const handleSessionEnd = async () => {
     if (backendSessionId) {
