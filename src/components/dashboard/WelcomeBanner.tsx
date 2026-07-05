@@ -7,7 +7,11 @@ function getGreeting() {
   return 'Good evening'
 }
 
-export default function WelcomeBanner() {
+interface WelcomeBannerProps {
+  topicsDue?: number
+}
+
+export default function WelcomeBanner({ topicsDue = 0 }: WelcomeBannerProps) {
   const { user } = useAuth()
   const firstName = user?.fullName?.split(' ')[0] ?? 'Scholar'
 
@@ -17,7 +21,11 @@ export default function WelcomeBanner() {
         {getGreeting()}, {firstName}.
       </h1>
       <p className="font-body-lg text-body-lg text-on-surface-variant">
-        You have <span className="font-bold text-primary">3 topics</span> due for review today.
+        {topicsDue > 0 ? (
+          <>You have <span className="font-bold text-primary">{topicsDue} topic{topicsDue !== 1 ? 's' : ''}</span> due for review today.</>
+        ) : (
+          <>You're all caught up! Keep exploring new material.</>
+        )}
       </p>
     </header>
   )

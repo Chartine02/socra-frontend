@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 
 const actions = [
   { to: '/documents', label: 'Upload', icon: Upload },
-  { to: '/study/socratic/demo-document', label: 'Socratic Session', icon: MessagesSquare },
-  { to: '/study/quiz/demo-document', label: 'Quiz', icon: Puzzle },
-  { to: '/study/flashcard/demo-document', label: 'Flashcards', icon: Layers },
+  { to: '/documents', label: 'Socratic Session', icon: MessagesSquare },
+  { to: '/documents', label: 'Quiz', icon: Puzzle },
+  { to: '/documents', label: 'Flashcards', icon: Layers },
 ]
 
 export default function QuickStartButtons() {

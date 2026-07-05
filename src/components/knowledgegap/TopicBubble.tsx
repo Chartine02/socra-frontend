@@ -17,7 +17,8 @@ const masteryConfig: Record<MasteryState, { label: string; border: string; bar: 
 }
 
 export default function TopicBubble({ node }: TopicBubbleProps) {
-  const config = masteryConfig[node.masteryState]
+  const normalizedState = node.masteryState?.toLowerCase() as MasteryState
+  const config = masteryConfig[normalizedState] ?? masteryConfig.shaky
 
   return (
     <div
