@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { BookOpen, Loader2, X } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import SocraticSession from '../../components/study/socratic/SocraticSession'
 import { studyService } from '../../services/studyService'
 import { useSessionStore } from '../../store/sessionStore'
@@ -12,6 +13,7 @@ const TAXONOMY_LEVELS: BloomLevel[] = ['remember', 'understand', 'apply', 'analy
 export default function SocraticPage() {
   const { documentId } = useParams<{ documentId: string }>()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -127,6 +129,8 @@ export default function SocraticPage() {
       }
     }
     resetSession()
+    queryClient.invalidateQueries({ queryKey: ['document', documentId] })
+    queryClient.invalidateQueries({ queryKey: ['documents'] })
     navigate(`/documents/${documentId}`)
   }
 

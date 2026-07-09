@@ -17,6 +17,7 @@ export interface Document {
   fileName: string
   fileSize?: number
   mimeType?: string
+  summary?: string | null
   uploadedAt: Date
   knowledgeUnits: KnowledgeUnit[]
   overallMastery: number

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Accessibility,
   Check,
@@ -8,10 +8,12 @@ import {
   Pencil,
   RefreshCw,
   SlidersHorizontal,
+  XCircle,
 } from 'lucide-react'
 import BottomNav from '../components/layout/BottomNav'
 import Navbar from '../components/layout/Navbar'
 import { useAuth } from '../hooks/useAuth'
+import { connectCanvasToken, disconnectCanvas, getCanvasTokenStatus } from '../services/canvasService'
 
 interface ToggleProps {
   checked: boolean
@@ -44,6 +46,45 @@ export default function SettingsPage() {
   const [studyReminders, setStudyReminders] = useState(true)
   const [reducedMotion, setReducedMotion] = useState(false)
   const [fontSize, setFontSize] = useState(50)
+
+  // Canvas integration state
+  const [canvasConnected, setCanvasConnected] = useState<boolean | null>(null)
+  const [canvasToken, setCanvasToken] = useState('')
+  const [canvasLoading, setCanvasLoading] = useState(false)
+  const [canvasError, setCanvasError] = useState('')
+
+  useEffect(() => {
+    getCanvasTokenStatus()
+      .then((s) => setCanvasConnected(s.connected))
+      .catch(() => setCanvasConnected(false))
+  }, [])
+
+  const handleCanvasConnect = async () => {
+    if (!canvasToken.trim()) return
+    setCanvasLoading(true)
+    setCanvasError('')
+    try {
+      await connectCanvasToken(canvasToken.trim())
+      setCanvasConnected(true)
+      setCanvasToken('')
+    } catch (err) {
+      setCanvasError(err instanceof Error ? err.message : 'Invalid token')
+    } finally {
+      setCanvasLoading(false)
+    }
+  }
+
+  const handleCanvasDisconnect = async () => {
+    setCanvasLoading(true)
+    try {
+      await disconnectCanvas()
+      setCanvasConnected(false)
+    } catch {
+      // ignore
+    } finally {
+      setCanvasLoading(false)
+    }
+  }
 
   const avatarUrl = user?.avatarUrl
   const initials =
@@ -93,26 +134,71 @@ export default function SettingsPage() {
 
         {/* Settings grid */}
         <div className="space-y-stack-md">
-          {/* Integrations */}
+          {/* Integrations — Canvas */}
           <div className="rounded-xl bg-socra-dark p-stack-md">
             <h2 className="mb-stack-sm flex items-center gap-2 font-label-lg text-label-lg text-primary">
               <RefreshCw className="text-primary" size={20} />
               Integrations
             </h2>
-            <div className="flex items-center justify-between rounded-lg border border-outline-variant/10 bg-surface-container-low p-stack-sm">
+            <div className="rounded-lg border border-outline-variant/10 bg-surface-container-low p-stack-sm">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded bg-[#e74c3c]/10">
                   <GraduationCap className="text-[#e74c3c]" size={20} />
                 </div>
                 <div>
-                  <p className="font-label-lg text-label-lg">Canvas LTI</p>
+                  <p className="font-label-lg text-label-lg">Canvas LMS</p>
                   <p className="text-label-sm text-on-surface-variant">Learning Management System</p>
                 </div>
               </div>
-              <span className="flex items-center gap-1 rounded-full bg-primary-container px-3 py-1 font-label-sm text-label-sm text-on-primary-container">
-                <CheckCircle2 size={14} />
-                Connected
-              </span>
+
+              {canvasConnected === null ? (
+                <p className="mt-3 text-label-sm text-on-surface-variant">Checking connection…</p>
+              ) : canvasConnected ? (
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="flex items-center gap-1 rounded-full bg-primary-container px-3 py-1 font-label-sm text-label-sm text-on-primary-container">
+                    <CheckCircle2 size={14} />
+                    Connected
+                  </span>
+                  <button
+                    className="flex items-center gap-1 rounded-lg border border-error/30 px-3 py-1.5 font-label-sm text-error transition-colors hover:bg-error/10 disabled:opacity-50"
+                    disabled={canvasLoading}
+                    onClick={handleCanvasDisconnect}
+                    type="button"
+                  >
+                    <XCircle size={14} />
+                    Disconnect
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-4 space-y-3">
+                  <p className="text-label-sm text-on-surface-variant">
+                    Go to Canvas → Account → Settings → <strong>+ New Access Token</strong> → copy and paste here.
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      className="flex-1 rounded-lg border border-outline-variant/20 bg-surface-container px-3 py-2 font-body-sm text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none"
+                      onChange={(e) => {
+                        setCanvasToken(e.target.value)
+                        setCanvasError('')
+                      }}
+                      placeholder="Paste your Canvas access token"
+                      type="password"
+                      value={canvasToken}
+                    />
+                    <button
+                      className="rounded-lg bg-primary px-4 py-2 font-label-md text-on-primary transition-colors hover:bg-primary/90 disabled:opacity-50"
+                      disabled={canvasLoading || !canvasToken.trim()}
+                      onClick={handleCanvasConnect}
+                      type="button"
+                    >
+                      {canvasLoading ? 'Connecting…' : 'Connect'}
+                    </button>
+                  </div>
+                  {canvasError && (
+                    <p className="text-label-sm text-error">{canvasError}</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

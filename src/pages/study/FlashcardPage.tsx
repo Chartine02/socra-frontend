@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, CheckCircle, Loader2 } from 'lucide-react'
 import BottomNav from '../../components/layout/BottomNav'
 import Navbar from '../../components/layout/Navbar'
@@ -10,6 +11,7 @@ import { useSessionStore } from '../../store/sessionStore'
 export default function FlashcardPage() {
   const { documentId } = useParams<{ documentId: string }>()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [allDone, setAllDone] = useState(false)
@@ -78,6 +80,8 @@ export default function FlashcardPage() {
       }
     }
     resetSession()
+    queryClient.invalidateQueries({ queryKey: ['document', documentId] })
+    queryClient.invalidateQueries({ queryKey: ['documents'] })
     navigate(`/documents/${documentId}`)
   }
 

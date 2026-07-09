@@ -13,6 +13,7 @@ import KnowledgeGapPage from '../pages/KnowledgeGapPage'
 import LandingPage from '../pages/LandingPage'
 import PostSessionPage from '../pages/PostSessionPage'
 import SettingsPage from '../pages/SettingsPage'
+import StudyNotesPage from '../pages/StudyNotesPage'
 import OnboardingLayout from '../pages/onboarding/OnboardingLayout'
 import ProfileStep from '../pages/onboarding/ProfileStep'
 import StudyModeStep from '../pages/onboarding/StudyModeStep'
@@ -86,6 +87,10 @@ export const router = createBrowserRouter([
       {
         path: '/documents/:documentId',
         element: <DocumentDetailPage />,
+      },
+      {
+        path: '/documents/:documentId/notes',
+        element: <StudyNotesPage />,
       },
       {
         path: '/knowledge-gap',

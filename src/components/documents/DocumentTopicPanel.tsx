@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronRight, Circle, Clock, Download, Layers, MessageSquareQuote, ShieldCheck, Sparkles, X } from 'lucide-react'
+import { BookOpen, CheckCircle2, ChevronRight, Circle, Clock, Download, Layers, MessageSquareQuote, ShieldCheck, Sparkles, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Document, KnowledgeUnit } from '../../types/document.types'
 
@@ -85,6 +85,26 @@ export default function DocumentTopicPanel({ document, onClose }: DocumentTopicP
               style={{ width: `${document.overallMastery}%` }}
             />
           </div>
+        </section>
+
+        <section>
+          <h4 className="mb-stack-md font-label-lg text-label-lg uppercase tracking-widest text-primary">
+            Study Notes
+          </h4>
+          {document.summary ? (
+            <Link
+              to={`/documents/${document.id}/notes`}
+              className="flex w-full items-center gap-2 rounded-xl border border-outline-variant/20 bg-white p-3 text-left transition-colors hover:border-primary/30"
+            >
+              <BookOpen className="h-4 w-4 text-primary" />
+              <span className="flex-1 font-label-md text-on-surface">View Study Notes</span>
+              <ChevronRight className="h-4 w-4 text-on-surface-variant" />
+            </Link>
+          ) : (
+            <p className="rounded-xl border border-dashed border-outline-variant/30 bg-white/50 px-4 py-3 text-center font-body-sm text-on-surface-variant/60">
+              No study notes yet — notes are generated when the document is processed.
+            </p>
+          )}
         </section>
 
         <section>

@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
   AlertTriangle,
   ArrowLeft,
+  BookOpen,
   CheckCircle2,
   ChevronRight,
   Circle,
@@ -206,6 +207,20 @@ export default function DocumentDetailPage() {
             />
           </div>
         </section>
+
+        {/* Study Notes */}
+        {document.summary && (
+          <section className="mb-stack-lg">
+            <Link
+              to={`/documents/${document.id}/notes`}
+              className="flex w-full items-center gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 transition-all hover:border-primary/40 hover:shadow-md"
+            >
+              <BookOpen className="h-5 w-5 text-primary" />
+              <span className="flex-1 font-label-lg text-label-lg text-on-surface">Study Notes</span>
+              <ChevronRight className="h-5 w-5 text-on-surface-variant" />
+            </Link>
+          </section>
+        )}
 
         {/* Study Mode Cards */}
         <section className="mb-stack-lg">

@@ -85,6 +85,11 @@ export default function DocumentCard({ document, isActive, onSelect }: DocumentC
         <span className={`rounded px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${tag.className}`}>
           {tag.label}
         </span>
+        {document.summary && (
+          <span className="rounded bg-primary-container/20 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+            Study Notes
+          </span>
+        )}
       </div>
     </button>
   )

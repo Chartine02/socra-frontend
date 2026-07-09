@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { PlusCircle } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { GraduationCap, PlusCircle } from 'lucide-react'
 import BottomNav from '../components/layout/BottomNav'
 import Navbar from '../components/layout/Navbar'
+import CanvasSyncModal from '../components/documents/CanvasSyncModal'
 import DocumentCard from '../components/documents/DocumentCard'
 import DocumentCardSkeleton from '../components/documents/DocumentCardSkeleton'
 import DocumentTopicPanel from '../components/documents/DocumentTopicPanel'
@@ -13,6 +14,7 @@ import type { Document } from '../types/document.types'
 
 export default function DocumentLibraryPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const queryClient = useQueryClient()
   const { mutate: upload } = useDocumentUpload()
   const uploadingDocs = useDocumentStore((state) => state.uploadingDocs)
 
@@ -27,6 +29,7 @@ export default function DocumentLibraryPage() {
   })
 
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [canvasModalOpen, setCanvasModalOpen] = useState(false)
   const activeDocument = documents.find((doc) => doc.id === activeId) ?? null
 
   const handleUploadClick = () => {
@@ -60,14 +63,24 @@ export default function DocumentLibraryPage() {
                 Manage your academic sources and track unit mastery.
               </p>
             </div>
-            <button
-              className="flex items-center gap-2 rounded-xl border-b-4 border-on-secondary-fixed-variant bg-primary-container px-6 py-3 font-label-lg text-label-lg text-on-primary-container shadow-xl transition-all hover:brightness-110 active:scale-95"
-              onClick={handleUploadClick}
-              type="button"
-            >
-              <PlusCircle className="h-5 w-5" />
-              Upload Document
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                className="flex items-center gap-2 rounded-xl border border-outline-variant/20 bg-surface-container px-5 py-3 font-label-lg text-label-lg text-on-surface shadow transition-all hover:brightness-110 active:scale-95"
+                onClick={() => setCanvasModalOpen(true)}
+                type="button"
+              >
+                <GraduationCap className="h-5 w-5" />
+                Import from Canvas
+              </button>
+              <button
+                className="flex items-center gap-2 rounded-xl border-b-4 border-on-secondary-fixed-variant bg-primary-container px-6 py-3 font-label-lg text-label-lg text-on-primary-container shadow-xl transition-all hover:brightness-110 active:scale-95"
+                onClick={handleUploadClick}
+                type="button"
+              >
+                <PlusCircle className="h-5 w-5" />
+                Upload Document
+              </button>
+            </div>
           </header>
 
           {isLoading ? (
@@ -99,6 +112,13 @@ export default function DocumentLibraryPage() {
 
         {activeDocument && <DocumentTopicPanel document={activeDocument} onClose={() => setActiveId(null)} />}
       </main>
+      <CanvasSyncModal
+        isOpen={canvasModalOpen}
+        onClose={() => setCanvasModalOpen(false)}
+        onSyncComplete={() => {
+          queryClient.invalidateQueries({ queryKey: ['documents'] })
+        }}
+      />
       <BottomNav />
     </div>
   )

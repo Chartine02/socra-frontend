@@ -31,10 +31,15 @@ api.interceptors.response.use(
       (error instanceof Error ? error.message : 'Unexpected API error')
 
     if (statusCode === 401) {
-      useAuthStore.getState().signOut()
+      const requestUrl = isAxiosError ? error.config?.url : undefined
+      const isCanvasTokenRequest = requestUrl?.includes('/canvas/token')
 
-      if (typeof window !== 'undefined' && window.location.pathname !== '/signin') {
-        window.location.assign('/signin')
+      if (!isCanvasTokenRequest) {
+        useAuthStore.getState().signOut()
+
+        if (typeof window !== 'undefined' && window.location.pathname !== '/signin') {
+          window.location.assign('/signin')
+        }
       }
     }
 
