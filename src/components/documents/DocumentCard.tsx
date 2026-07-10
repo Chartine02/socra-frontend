@@ -26,7 +26,7 @@ export default function DocumentCard({ document, isActive, onSelect }: DocumentC
 
   return (
     <button
-      className={`group relative flex flex-col rounded-xl p-6 text-left shadow-sm transition-all ${
+      className={`group relative flex h-[280px] flex-col rounded-xl p-6 text-left shadow-sm transition-all ${
         isActive
           ? 'border border-primary/30 bg-white ring-2 ring-primary-container'
           : 'border border-outline-variant/40 bg-white hover:border-primary/40'
@@ -68,20 +68,20 @@ export default function DocumentCard({ document, isActive, onSelect }: DocumentC
         </div>
       </div>
 
-      <h3 className="mb-2 font-headline-md text-headline-md text-on-surface">{document.fileName}</h3>
+      <h3 className="mb-2 line-clamp-2 font-headline-md text-headline-md text-on-surface">{document.fileName}</h3>
 
-      <div className="mb-stack-md flex flex-col gap-1">
+      <div className="mt-auto flex flex-col gap-1">
         <span className="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
-          <Calendar className="h-3.5 w-3.5" />
+          <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
           {formatDate(document.uploadedAt)}
         </span>
         <span className="flex items-center gap-1 font-label-sm text-label-sm text-primary">
-          <BookOpen className="h-3.5 w-3.5" />
+          <BookOpen className="h-3.5 w-3.5 flex-shrink-0" />
           {document.knowledgeUnits?.length ?? 0} Knowledge Units
         </span>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="mt-stack-md flex flex-wrap gap-2">
         <span className={`rounded px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${tag.className}`}>
           {tag.label}
         </span>

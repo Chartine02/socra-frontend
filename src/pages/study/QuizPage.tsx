@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
@@ -23,29 +23,39 @@ export default function QuizPage() {
     resetSession,
   } = useSessionStore()
 
-  const initSession = useCallback(async () => {
+  useEffect(() => {
     if (!documentId) return
-    try {
-      setLoading(true)
-      setError(null)
 
-      const session = await studyService.createSession(documentId, 'quiz')
-      setBackendSessionId(session.id)
-      setCurrentDocumentId(documentId)
-      setMode('quiz')
+    let cancelled = false
 
-      const questions = await studyService.generateQuiz(session.id, documentId, 10)
-      setQuizQuestions(questions)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start quiz session')
-    } finally {
-      setLoading(false)
+    const init = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        const session = await studyService.createSession(documentId, 'quiz')
+        if (cancelled) return
+        setBackendSessionId(session.id)
+        setCurrentDocumentId(documentId)
+        setMode('quiz')
+
+        const questions = await studyService.generateQuiz(session.id, documentId, 10)
+        if (cancelled) return
+        setQuizQuestions(questions)
+      } catch (err) {
+        if (cancelled) return
+        setError(err instanceof Error ? err.message : 'Failed to start quiz session')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    init()
+
+    return () => {
+      cancelled = true
     }
   }, [documentId, setBackendSessionId, setCurrentDocumentId, setMode, setQuizQuestions])
-
-  useEffect(() => {
-    initSession()
-  }, [initSession])
 
   const handleSessionEnd = async (scorePercent: number, itemsCompleted: number) => {
     if (backendSessionId) {
