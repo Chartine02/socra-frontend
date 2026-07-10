@@ -23,6 +23,7 @@ export default function SocraticPage() {
     dialogueTurns,
     isSessionComplete,
     isAiTyping,
+    sessionStartTime,
     setBackendSessionId,
     setCurrentDocumentId,
     setMode,
@@ -128,6 +129,7 @@ export default function SocraticPage() {
         // best-effort
       }
     }
+    const startedAt = sessionStartTime?.toISOString()
     resetSession()
     queryClient.invalidateQueries({ queryKey: ['document', documentId] })
     queryClient.invalidateQueries({ queryKey: ['documents'] })
@@ -138,6 +140,7 @@ export default function SocraticPage() {
         mode: 'socratic',
         itemsCompleted,
         finalBloomLevel: currentBloomLevel,
+        startedAt,
       },
     })
   }

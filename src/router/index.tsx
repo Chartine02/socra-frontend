@@ -18,6 +18,7 @@ import OnboardingLayout from '../pages/onboarding/OnboardingLayout'
 import ProfileStep from '../pages/onboarding/ProfileStep'
 import StudyModeStep from '../pages/onboarding/StudyModeStep'
 import UploadStep from '../pages/onboarding/UploadStep'
+import CanvasPerformancePage from '../pages/CanvasPerformancePage'
 import FlashcardPage from '../pages/study/FlashcardPage'
 import QuizPage from '../pages/study/QuizPage'
 import SocraticPage from '../pages/study/SocraticPage'
@@ -95,6 +96,10 @@ export const router = createBrowserRouter([
       {
         path: '/knowledge-gap',
         element: <KnowledgeGapPage />,
+      },
+      {
+        path: '/performance',
+        element: <CanvasPerformancePage />,
       },
       {
         path: '/study/socratic/:documentId',

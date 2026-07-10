@@ -16,6 +16,7 @@ export default function QuizPage() {
   const {
     backendSessionId,
     quizQuestions,
+    sessionStartTime,
     setBackendSessionId,
     setCurrentDocumentId,
     setQuizQuestions,
@@ -69,6 +70,7 @@ export default function QuizPage() {
         // best-effort
       }
     }
+    const startedAt = sessionStartTime?.toISOString()
     resetSession()
     queryClient.invalidateQueries({ queryKey: ['document', documentId] })
     queryClient.invalidateQueries({ queryKey: ['documents'] })
@@ -79,6 +81,7 @@ export default function QuizPage() {
         mode: 'quiz',
         scorePercent,
         itemsCompleted,
+        startedAt,
       },
     })
   }

@@ -5,7 +5,16 @@ import { RouterProvider } from 'react-router-dom'
 import './index.css'
 import { router } from './router'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,   // 5 minutes – cached data is reused across navigations
+      gcTime: 10 * 60 * 1000,     // 10 minutes – keep unused cache entries before GC
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -2,11 +2,13 @@ import { Flame, LogOut } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useStreak } from '../../hooks/useKnowledgeGap'
+import NotificationBell from '../notifications/NotificationBell'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/documents', label: 'Documents' },
   { to: '/knowledge-gap', label: 'Knowledge Gap' },
+  { to: '/performance', label: 'Performance' },
 ]
 
 export default function Navbar() {
@@ -51,6 +53,7 @@ export default function Navbar() {
             <Flame className="h-5 w-5" fill="currentColor" />
             <span className="ml-1 font-label-lg text-label-lg">{streak}</span>
           </div>
+          <NotificationBell />
           <NavLink
             className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary-container bg-primary-container font-label-lg text-label-lg text-on-primary-container"
             title={user?.fullName ?? 'Profile'}

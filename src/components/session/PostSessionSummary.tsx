@@ -1,168 +1,173 @@
 import {
-  Award,
-  BookOpen,
   CheckCircle2,
+  Clock,
   Flame,
   LayoutDashboard,
-  LineChart,
+  Lightbulb,
   RefreshCw,
-  TrendingDown,
   TriangleAlert,
-  Zap,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import Card from '../ui/Card'
+import ProgressBar from '../ui/ProgressBar'
+import Button from '../ui/Button'
 
-export interface MasteredTopic {
+export interface ReviewedTopic {
   name: string
-  level: number
+  mastery: 'mastered' | 'shaky' | 'forgotten'
+  masteryPercent: number
 }
 
 export interface SessionSummaryView {
-  badgeLabel: string
-  title: string
-  message: string
-  topicsCovered: number
-  accuracy: number
+  modeLabel: string
+  documentName: string
+  scorePercent: number | null
+  itemsCompleted: number
   streakDays: number
-  masteredTopics: MasteredTopic[]
-  needsReview: string[]
-  nextDescription: string
-  suggestions: string[]
+  durationLabel: string
+  reviewedTopics: ReviewedTopic[]
+  weakTopics: string[]
+  encouragement: string
 }
 
 interface PostSessionSummaryProps {
   summary: SessionSummaryView
+  onStudyAgain: () => void
 }
 
-export default function PostSessionSummary({ summary }: PostSessionSummaryProps) {
+const masteryBadge: Record<ReviewedTopic['mastery'], { bg: string; text: string; label: string }> = {
+  mastered: { bg: 'bg-socra-forest/15', text: 'text-socra-sage', label: 'Mastered' },
+  shaky: { bg: 'bg-socra-midbrown/15', text: 'text-socra-midbrown', label: 'Shaky' },
+  forgotten: { bg: 'bg-socra-richbrown/15', text: 'text-socra-richbrown', label: 'Needs Review' },
+}
+
+export default function PostSessionSummary({ summary, onStudyAgain }: PostSessionSummaryProps) {
   const navigate = useNavigate()
 
   return (
-    <div className="space-y-stack-lg">
-      {/* Hero Section */}
-      <header className="space-y-stack-sm text-center">
-        <div className="inline-flex items-center gap-2 rounded-full bg-tertiary-container px-3 py-1 text-on-tertiary-container">
-          <Award size={16} />
-          <span className="font-label-sm text-label-sm">{summary.badgeLabel}</span>
-        </div>
-        <h1 className="font-headline-lg text-headline-lg text-on-surface md:text-display">{summary.title}</h1>
-        <div className="flex justify-center">
-          <div className="max-w-md rounded-[16px_16px_16px_4px] border border-outline-variant/20 bg-surface-container-highest p-stack-md">
-            <p className="font-body-lg text-body-lg text-primary">"{summary.message}"</p>
-          </div>
-        </div>
-      </header>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <span className="mb-1 inline-block rounded-full bg-socra-forest/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-socra-sage">
+          {summary.modeLabel}
+        </span>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-on-surface">
+          {summary.documentName}
+        </h1>
+        <p className="mt-1 text-sm text-on-surface-variant">{summary.encouragement}</p>
+      </div>
 
-      {/* Stats Grid */}
-      <section className="grid grid-cols-1 gap-stack-md md:grid-cols-3">
-        <div className="flex flex-col items-center justify-center space-y-2 rounded-xl bg-socra-dark p-stack-md text-center">
-          <BookOpen className="text-primary" size={36} />
-          <div>
-            <div className="font-display text-4xl text-on-surface">{summary.topicsCovered}</div>
-            <div className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
-              Topics Covered
-            </div>
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {summary.scorePercent !== null && (
+          <Card className="flex flex-col items-center gap-1 py-4 text-center">
+            <span className="text-2xl font-bold text-on-surface">{summary.scorePercent}%</span>
+            <span className="text-xs uppercase tracking-wider text-on-surface-variant">Score</span>
+          </Card>
+        )}
+        <Card className="flex flex-col items-center gap-1 py-4 text-center">
+          <span className="text-2xl font-bold text-on-surface">{summary.itemsCompleted}</span>
+          <span className="text-xs uppercase tracking-wider text-on-surface-variant">
+            Items Completed
+          </span>
+        </Card>
+        <Card className="flex flex-col items-center gap-1 py-4 text-center">
+          <div className="flex items-center gap-1 text-2xl font-bold text-on-surface">
+            <Flame className="h-5 w-5 text-primary" fill="currentColor" />
+            {summary.streakDays}
           </div>
-        </div>
-        <div className="flex flex-col items-center justify-center space-y-2 rounded-xl border-b-4 border-primary-container bg-socra-dark p-stack-md text-center">
-          <LineChart className="text-primary" size={36} />
-          <div>
-            <div className="font-display text-4xl text-on-surface">{summary.accuracy}%</div>
-            <div className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Accuracy</div>
+          <span className="text-xs uppercase tracking-wider text-on-surface-variant">
+            Day Streak
+          </span>
+        </Card>
+        <Card className="flex flex-col items-center gap-1 py-4 text-center">
+          <div className="flex items-center gap-1 text-2xl font-bold text-on-surface">
+            <Clock className="h-4 w-4 text-on-surface-variant" />
+            {summary.durationLabel}
           </div>
-        </div>
-        <div className="flex flex-col items-center justify-center space-y-2 rounded-xl bg-socra-dark p-stack-md text-center">
-          <Flame className="text-tertiary" fill="currentColor" size={36} />
-          <div>
-            <div className="font-display text-4xl text-on-surface">{summary.streakDays} Days</div>
-            <div className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
-              New Streak
-            </div>
-          </div>
-        </div>
-      </section>
+          <span className="text-xs uppercase tracking-wider text-on-surface-variant">Duration</span>
+        </Card>
+      </div>
 
-      {/* Insights Section */}
-      <section className="grid grid-cols-1 gap-stack-lg md:grid-cols-2">
-        {/* Mastered Topics */}
-        <div className="space-y-stack-md">
-          <h3 className="flex items-center gap-2 font-label-lg text-label-lg text-on-surface-variant">
-            <CheckCircle2 className="text-primary-container" size={20} />
-            Mastered Topics
-          </h3>
-          <ul className="space-y-stack-sm">
-            {summary.masteredTopics.map((topic) => (
-              <li
-                key={topic.name}
-                className="flex items-center justify-between rounded-lg bg-socra-dark p-stack-md"
-              >
-                <span className="font-body-md text-body-md font-bold text-primary-container">{topic.name}</span>
-                <span className="rounded bg-primary-container/20 px-2 py-0.5 font-label-sm text-label-sm text-primary-container">
-                  Level {topic.level}
-                </span>
-              </li>
-            ))}
+      {/* Score bar */}
+      {summary.scorePercent !== null && (
+        <Card>
+          <ProgressBar label="Overall Score" value={summary.scorePercent} />
+        </Card>
+      )}
+
+      {/* Topics reviewed */}
+      {summary.reviewedTopics.length > 0 && (
+        <Card>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-on-surface-variant">
+            Topics Reviewed
+          </h2>
+          <ul className="space-y-3">
+            {summary.reviewedTopics.map((topic) => {
+              const badge = masteryBadge[topic.mastery]
+              return (
+                <li
+                  className="flex items-center justify-between rounded-lg bg-socra-darkest/30 px-4 py-3"
+                  key={topic.name}
+                >
+                  <div className="flex items-center gap-3">
+                    {topic.mastery === 'mastered' ? (
+                      <CheckCircle2 className="h-4 w-4 text-socra-sage" />
+                    ) : (
+                      <TriangleAlert className="h-4 w-4 text-socra-midbrown" />
+                    )}
+                    <span className="text-sm font-medium text-on-surface">{topic.name}</span>
+                  </div>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.bg} ${badge.text}`}
+                  >
+                    {badge.label}
+                  </span>
+                </li>
+              )
+            })}
           </ul>
-        </div>
+        </Card>
+      )}
 
-        {/* Needs Review */}
-        <div className="space-y-stack-md">
-          <h3 className="flex items-center gap-2 font-label-lg text-label-lg text-on-surface-variant">
-            <TriangleAlert className="text-forgotten" size={20} />
-            Needs Review
-          </h3>
-          <ul className="space-y-stack-sm">
-            {summary.needsReview.map((topic) => (
-              <li key={topic} className="flex items-center justify-between rounded-lg bg-socra-dark p-stack-md">
-                <span className="font-body-md text-body-md font-bold text-forgotten">{topic}</span>
-                <TrendingDown className="text-forgotten" size={16} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* Future Path */}
-      <section className="relative space-y-stack-md overflow-hidden rounded-xl bg-socra-dark p-stack-lg">
-        <div className="pointer-events-none absolute -right-12 -top-12 opacity-10">
-          <BookOpen size={160} />
-        </div>
-        <div className="relative z-10">
-          <h2 className="font-headline-md text-headline-md text-on-surface">What to study next</h2>
-          <p className="mb-stack-md font-body-md text-body-md text-on-surface-variant">{summary.nextDescription}</p>
-          <div className="flex flex-wrap gap-stack-sm">
-            {summary.suggestions.map((suggestion) => (
-              <div
-                key={suggestion}
-                className="flex items-center gap-2 rounded-full border border-outline-variant/30 bg-surface-container-highest px-stack-md py-stack-sm"
+      {/* What to focus on */}
+      {summary.weakTopics.length > 0 && (
+        <Card>
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-on-surface-variant">
+            <Lightbulb className="h-4 w-4 text-socra-sage" />
+            Focus Next
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {summary.weakTopics.map((topic) => (
+              <span
+                className="rounded-full bg-socra-richbrown/15 px-3 py-1 text-xs font-medium text-socra-richbrown"
+                key={topic}
               >
-                <Zap className="text-tertiary" size={14} />
-                <span className="font-label-sm text-label-sm">{suggestion}</span>
-              </div>
+                {topic}
+              </span>
             ))}
           </div>
-        </div>
-      </section>
+        </Card>
+      )}
 
-      {/* CTA Section */}
-      <footer className="flex flex-col gap-stack-md pt-stack-lg md:flex-row">
-        <button
-          className="tactile-button flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary-container py-stack-md font-label-lg text-lg text-on-primary-container"
-          onClick={() => navigate(-1)}
-          type="button"
+      {/* Actions */}
+      <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+        <Button
+          className="flex-1"
+          iconLeft={<RefreshCw className="h-4 w-4" />}
+          onClick={onStudyAgain}
         >
-          <RefreshCw size={20} />
           Study Again
-        </button>
-        <button
-          className="tactile-button flex flex-1 items-center justify-center gap-2 rounded-xl bg-surface-container-highest py-stack-md font-label-lg text-lg text-on-surface"
+        </Button>
+        <Button
+          className="flex-1"
+          iconLeft={<LayoutDashboard className="h-4 w-4" />}
           onClick={() => navigate('/dashboard')}
-          type="button"
+          variant="secondary"
         >
-          <LayoutDashboard size={20} />
           Back to Dashboard
-        </button>
-      </footer>
+        </Button>
+      </div>
     </div>
   )
 }

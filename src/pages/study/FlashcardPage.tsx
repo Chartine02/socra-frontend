@@ -19,6 +19,7 @@ export default function FlashcardPage() {
   const {
     backendSessionId,
     flashcards,
+    sessionStartTime,
     setBackendSessionId,
     setCurrentDocumentId,
     setFlashcards,
@@ -79,6 +80,7 @@ export default function FlashcardPage() {
         // silently fail — session end is best-effort
       }
     }
+    const startedAt = sessionStartTime?.toISOString()
     resetSession()
     queryClient.invalidateQueries({ queryKey: ['document', documentId] })
     queryClient.invalidateQueries({ queryKey: ['documents'] })
@@ -88,6 +90,7 @@ export default function FlashcardPage() {
         documentId,
         mode: 'flashcard',
         itemsCompleted,
+        startedAt,
       },
     })
   }

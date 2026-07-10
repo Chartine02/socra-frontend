@@ -8,6 +8,7 @@ import { documentService } from '../services/documentService'
 import { analyticsService } from '../services/analyticsService'
 import { BLOOM_LABELS } from '../utils/constants'
 import type { BloomLevel, StudyMode } from '../types/study.types'
+import { Button } from '../components/ui'
 
 const MODE_LABELS: Record<StudyMode, string> = {
   socratic: 'Socratic Session',
@@ -22,6 +23,7 @@ export interface PostSessionState {
   scorePercent?: number
   itemsCompleted: number
   finalBloomLevel?: BloomLevel
+  startedAt?: string
 }
 
 export default function PostSessionPage() {
@@ -53,13 +55,7 @@ export default function PostSessionPage() {
         <Navbar />
         <main className="flex flex-grow flex-col items-center justify-center gap-4 px-4">
           <p className="text-on-surface-variant">No session data available.</p>
-          <button
-            className="rounded-lg bg-primary-container px-4 py-2 text-on-primary-container"
-            onClick={() => navigate('/dashboard')}
-            type="button"
-          >
-            Go to Dashboard
-          </button>
+          <Button onClick={() => navigate('/dashboard')}>Go to Dashboard</Button>
         </main>
         <BottomNav />
       </div>
@@ -79,51 +75,64 @@ export default function PostSessionPage() {
   }
 
   const topics = knowledgeGapData?.topics ?? []
-  const masteredTopics = topics
-    .filter((t) => t.masteryState === 'mastered')
-    .slice(0, 5)
-    .map((t) => ({ name: t.topic, level: Math.round(t.masteryPercentage / 20) }))
 
-  const needsReview = topics
+  const reviewedTopics = topics.slice(0, 8).map((t) => ({
+    name: t.topic,
+    mastery: t.masteryState,
+    masteryPercent: t.masteryPercentage,
+  }))
+
+  const weakTopics = topics
     .filter((t) => t.masteryState === 'forgotten' || t.masteryState === 'shaky')
-    .slice(0, 4)
+    .slice(0, 6)
     .map((t) => t.topic)
 
-  const shakyTopics = topics
-    .filter((t) => t.masteryState === 'shaky')
-    .slice(0, 2)
-    .map((t) => t.topic)
+  const accuracy =
+    state.scorePercent ??
+    (topics.length > 0
+      ? Math.round(topics.reduce((sum, t) => sum + t.masteryPercentage, 0) / topics.length)
+      : null)
 
-  const accuracy = state.scorePercent ?? (state.itemsCompleted > 0 ? Math.round((masteredTopics.length / Math.max(topics.length, 1)) * 100) : 0)
+  // Compute duration
+  let durationLabel = '—'
+  if (state.startedAt) {
+    const mins = Math.round((Date.now() - new Date(state.startedAt).getTime()) / 60_000)
+    durationLabel = mins < 1 ? '<1 min' : mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)}h ${mins % 60}m`
+  }
 
-  const bloomMessage = state.finalBloomLevel
-    ? `You reached the ${BLOOM_LABELS[state.finalBloomLevel]} level in Bloom's Taxonomy.`
-    : accuracy >= 80
-      ? 'Great job! You demonstrated strong mastery.'
-      : accuracy >= 50
-        ? 'Solid effort. Keep reviewing to strengthen your knowledge.'
-        : 'Keep studying — practice makes perfect!'
+  const encouragement = state.finalBloomLevel
+    ? `You reached the ${BLOOM_LABELS[state.finalBloomLevel]} level in Bloom's Taxonomy — great depth!`
+    : accuracy !== null && accuracy >= 80
+      ? 'Excellent work! You demonstrated strong mastery of this material.'
+      : accuracy !== null && accuracy >= 50
+        ? 'Solid effort — keep reviewing to lock in your knowledge.'
+        : 'Every session counts. Keep at it and you\'ll see progress!'
 
   const summary: SessionSummaryView = {
-    badgeLabel: MODE_LABELS[state.mode] ?? 'Study Session',
-    title: document?.fileName ?? 'Study Session',
-    message: bloomMessage,
-    topicsCovered: state.itemsCompleted,
-    accuracy,
+    modeLabel: MODE_LABELS[state.mode] ?? 'Study Session',
+    documentName: document?.fileName ?? 'Study Session',
+    scorePercent: accuracy,
+    itemsCompleted: state.itemsCompleted,
     streakDays: streakData?.currentStreak ?? 0,
-    masteredTopics,
-    needsReview,
-    nextDescription: needsReview.length > 0
-      ? `Based on your performance, focus on strengthening: ${needsReview.slice(0, 2).join(', ')}.`
-      : 'All topics are looking good! Consider exploring new material.',
-    suggestions: shakyTopics.length > 0 ? shakyTopics : ['Review previous material', 'Upload new documents'],
+    durationLabel,
+    reviewedTopics,
+    weakTopics,
+    encouragement,
+  }
+
+  function handleStudyAgain() {
+    if (state) {
+      navigate(`/study/${state.mode}/${state.documentId}`)
+    } else {
+      navigate(-1)
+    }
   }
 
   return (
-    <div className="library-mesh min-h-screen pb-24 md:pb-0">
+    <div className="min-h-screen bg-surface pb-24 md:pb-0">
       <Navbar />
-      <main className="mx-auto max-w-4xl px-container-margin py-stack-lg">
-        <PostSessionSummary summary={summary} />
+      <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+        <PostSessionSummary summary={summary} onStudyAgain={handleStudyAgain} />
       </main>
       <BottomNav />
     </div>

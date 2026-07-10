@@ -21,7 +21,10 @@ export default function KnowledgeGapMap({ nodes, stats }: KnowledgeGapMapProps) 
   const [activeFilter, setActiveFilter] = useState<MasteryState | 'all'>('all')
 
   const filteredNodes = useMemo(
-    () => (activeFilter === 'all' ? nodes : nodes.filter((node) => node.masteryState === activeFilter)),
+    () =>
+      activeFilter === 'all'
+        ? nodes
+        : nodes.filter((node) => node.masteryState.toLowerCase() === activeFilter),
     [activeFilter, nodes],
   )
 
@@ -71,8 +74,8 @@ export default function KnowledgeGapMap({ nodes, stats }: KnowledgeGapMapProps) 
 
       {/* Grid / Map View */}
       <div className="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-3">
-        {filteredNodes.map((node) => (
-          <TopicBubble key={node.id} node={node} />
+        {filteredNodes.map((node, index) => (
+          <TopicBubble key={node.id ?? index} node={node} />
         ))}
       </div>
 
