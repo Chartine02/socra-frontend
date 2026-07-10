@@ -15,6 +15,7 @@ SOCRA is an AI-powered study companion that converts your course materials into 
 
 - [Demo Video](#demo-video)
 - [Live / Deployed Version](#live--deployed-version)
+- [Backend Repo]()
 - [Core Features](#core-features)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -30,7 +31,7 @@ SOCRA is an AI-powered study companion that converts your course materials into 
 
 ## Demo Video
 
-> A 5-minute walkthrough showcasing SOCRA's core features (document upload, Socratic dialogue, quiz mode, flashcards, knowledge gap map, Canvas LMS integration, and dashboard analytics).
+> A walkthrough showcasing SOCRA's core features (document upload, Socratic dialogue, quiz mode, flashcards, knowledge gap map, Canvas LMS integration, and dashboard analytics).
 
 **[Watch the Demo Video](https://drive.google.com/drive/folders/1ry1JxhUj1rzdPMw5-txIM4uZYsTiJnsG?usp=drive_link)** 
 
@@ -38,7 +39,13 @@ SOCRA is an AI-powered study companion that converts your course materials into 
 
 ## Live / Deployed Version
 
-**[https://your-deployed-url-here.com](https://socra-frontend.onrender.com/)** 
+**[https://socra-frontend.onrender.com](https://socra-frontend.onrender.com/)** 
+
+---
+
+## Backend Repo
+
+**[https://github.com/Chartine02/socra-backend](https://github.com/Chartine02/socra-backend)** 
 
 ---
 
