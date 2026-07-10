@@ -68,7 +68,7 @@ export default function DocumentCard({ document, isActive, onSelect }: DocumentC
         </div>
       </div>
 
-      <h3 className="mb-2 line-clamp-2 font-headline-md text-headline-md text-on-surface">{document.fileName}</h3>
+      <h3 className="mb-2 line-clamp-2 text-sm font-semibold text-on-surface">{document.fileName}</h3>
 
       <div className="mt-auto flex flex-col gap-1">
         <span className="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
