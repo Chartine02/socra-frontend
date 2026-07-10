@@ -24,6 +24,7 @@ SOCRA is an AI-powered study companion that converts your course materials into 
 - [Building for Production](#building-for-production)
 - [Environment Variables](#environment-variables)
 - [Related Files & Key Directories](#related-files--key-directories)
+- [Additional Documentation](#additional-documentation)
 
 ---
 
@@ -31,13 +32,13 @@ SOCRA is an AI-powered study companion that converts your course materials into 
 
 > A 5-minute walkthrough showcasing SOCRA's core features (document upload, Socratic dialogue, quiz mode, flashcards, knowledge gap map, Canvas LMS integration, and dashboard analytics).
 
-**[Watch the Demo Video](https://your-video-link-here.com)** *(replace with actual link)*
+**[Watch the Demo Video](https://drive.google.com/drive/folders/1ry1JxhUj1rzdPMw5-txIM4uZYsTiJnsG?usp=drive_link)** 
 
 ---
 
 ## Live / Deployed Version
 
-**[https://your-deployed-url-here.com](https://your-deployed-url-here.com)** *(replace with actual link)*
+**[https://your-deployed-url-here.com](https://socra-frontend.onrender.com/)** 
 
 ---
 
@@ -152,11 +153,9 @@ git --version
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/socra-frontend.git
+git clone https://github.com/Chartine02/socra-frontend.git
 cd socra-frontend
 ```
-
-*(Replace the URL with the actual repository URL.)*
 
 ### 2. Install dependencies
 
@@ -264,3 +263,16 @@ The output in `build/` is ready to be deployed to any static hosting provider (V
 | `src/store/authStore.ts` | Zustand store for authentication state and JWT management |
 | `src/utils/sm2.ts` | SM-2 spaced repetition algorithm implementation |
 | `src/utils/bloomsHelper.ts` | Bloom's Taxonomy level utilities for Socratic dialogue |
+
+---
+
+## Additional Documentation
+
+Detailed rubric-aligned documentation is available in the [`docs/`](docs/) folder:
+
+| Document | Description |
+|---|---|
+| [Testing Results & Strategies](docs/TESTING.md) | Testing strategies employed, edge cases covered, and key test results |
+| [Analysis of Results](docs/ANALYSIS.md) | How implementation aligns with proposal objectives; where results exceeded expectations |
+| [Deployment Plan & Execution](docs/DEPLOYMENT.md) | Architecture overview, step-by-step deployment guide, platform options, and tools used |
+| [Functionality, Scope & Algorithms](docs/FUNCTIONALITY.md) | Core functionalities breakdown, SM-2 algorithm details, Bloom's Taxonomy progression, and custom logic |
