@@ -26,15 +26,16 @@ function Toggle({ checked, label, onChange }: ToggleProps) {
     <button
       aria-label={label}
       aria-pressed={checked}
-      className={`relative h-6 w-11 flex-shrink-0 rounded-full transition-colors duration-200 ${
-        checked ? 'bg-socra-forest' : 'bg-surface-container'
+      className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ${
+        checked ? 'bg-socra-forest' : 'bg-outline/30'
       }`}
       onClick={() => onChange(!checked)}
+      role="switch"
       type="button"
     >
       <span
-        className={`absolute top-[3px] h-[18px] w-[18px] rounded-full bg-on-surface transition-transform duration-200 ${
-          checked ? 'translate-x-[23px]' : 'translate-x-[3px]'
+        className={`inline-block h-5 w-5 rounded-full shadow-md transition-transform duration-200 ${
+          checked ? 'translate-x-6 bg-white' : 'translate-x-1 bg-white'
         }`}
       />
     </button>
@@ -43,11 +44,37 @@ function Toggle({ checked, label, onChange }: ToggleProps) {
 
 export default function SettingsPage() {
   const { signOut, user } = useAuth()
-  const [studyReminders, setStudyReminders] = useState(true)
-  const [reducedMotion, setReducedMotion] = useState(false)
-  const [fontSize, setFontSize] = useState(50)
+  const [studyReminders, setStudyReminders] = useState(() => {
+    const saved = localStorage.getItem('socra-study-reminders')
+    return saved !== null ? saved === 'true' : true
+  })
+  const [reducedMotion, setReducedMotion] = useState(() => {
+    const saved = localStorage.getItem('socra-reduced-motion')
+    return saved === 'true'
+  })
+  const [fontSize, setFontSize] = useState(() => {
+    const saved = localStorage.getItem('socra-font-size')
+    return saved !== null ? Number(saved) : 50
+  })
 
-  // Canvas integration state
+  useEffect(() => {
+    document.documentElement.classList.toggle('reduce-motion', reducedMotion)
+  }, [reducedMotion])
+
+  useEffect(() => {
+    const size = 14 + (fontSize / 100) * 6
+    document.documentElement.style.fontSize = `${size}px`
+    return () => {
+      document.documentElement.style.fontSize = ''
+    }
+  }, [fontSize])
+
+  const handleSavePreferences = () => {
+    localStorage.setItem('socra-study-reminders', String(studyReminders))
+    localStorage.setItem('socra-reduced-motion', String(reducedMotion))
+    localStorage.setItem('socra-font-size', String(fontSize))
+  }
+
   const [canvasConnected, setCanvasConnected] = useState<boolean | null>(null)
   const [canvasToken, setCanvasToken] = useState('')
   const [canvasLoading, setCanvasLoading] = useState(false)
@@ -266,6 +293,7 @@ export default function SettingsPage() {
             </button>
             <button
               className="tactile-button mt-stack-md flex w-full items-center justify-center gap-2 rounded-xl bg-primary-container py-4 font-label-lg text-label-lg text-on-primary-container transition-all"
+              onClick={handleSavePreferences}
               type="button"
             >
               <Check size={18} />

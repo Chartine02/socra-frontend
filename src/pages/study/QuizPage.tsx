@@ -62,7 +62,15 @@ export default function QuizPage() {
     resetSession()
     queryClient.invalidateQueries({ queryKey: ['document', documentId] })
     queryClient.invalidateQueries({ queryKey: ['documents'] })
-    navigate(`/documents/${documentId}`)
+    navigate('/session/summary', {
+      state: {
+        sessionId: backendSessionId,
+        documentId,
+        mode: 'quiz',
+        scorePercent,
+        itemsCompleted,
+      },
+    })
   }
 
   if (loading) {

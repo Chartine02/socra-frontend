@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import type { GapMapNode } from '../../types/analytics.types'
 import type { MasteryState } from '../../types/study.types'
 
@@ -17,6 +18,7 @@ const masteryConfig: Record<MasteryState, { label: string; border: string; bar: 
 }
 
 export default function TopicBubble({ node }: TopicBubbleProps) {
+  const navigate = useNavigate()
   const normalizedState = node.masteryState?.toLowerCase() as MasteryState
   const config = masteryConfig[normalizedState] ?? masteryConfig.shaky
 
@@ -46,6 +48,7 @@ export default function TopicBubble({ node }: TopicBubbleProps) {
         <span className="font-label-sm text-label-sm text-outline">Last: {node.lastReviewed ?? '—'}</span>
         <button
           className="rounded-lg bg-primary-container px-4 py-2 font-label-lg text-label-lg text-on-primary-container shadow-sm transition-all hover:brightness-110 active:scale-95"
+          onClick={() => navigate('/documents')}
           type="button"
         >
           Study Now

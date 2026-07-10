@@ -33,7 +33,7 @@ export default function KnowledgeGapMap({ nodes, stats }: KnowledgeGapMapProps) 
           <div>
             <h1 className="mb-1 font-headline-lg text-headline-lg text-on-surface">Knowledge Gap Map</h1>
             <p className="font-body-md text-body-md text-on-surface-variant">
-              Your intellectual landscape across Economics 101.
+              Your intellectual landscape — track mastery across all your topics.
             </p>
           </div>
           <GapMapFilters activeFilter={activeFilter} onChange={setActiveFilter} />

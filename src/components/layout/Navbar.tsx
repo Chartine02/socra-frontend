@@ -1,6 +1,7 @@
 import { Flame, LogOut } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { useStreak } from '../../hooks/useKnowledgeGap'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -10,6 +11,8 @@ const navItems = [
 
 export default function Navbar() {
   const { signOut, user } = useAuth()
+  const { data: streakData } = useStreak()
+  const streak = streakData?.currentStreak ?? user?.studyStreak ?? 0
   const initials =
     user?.fullName
       ?.split(' ')
@@ -46,7 +49,7 @@ export default function Navbar() {
         <div className="flex items-center gap-stack-md">
           <div className="flex items-center rounded-full bg-surface-container px-3 py-1 text-primary">
             <Flame className="h-5 w-5" fill="currentColor" />
-            <span className="ml-1 font-label-lg text-label-lg">7</span>
+            <span className="ml-1 font-label-lg text-label-lg">{streak}</span>
           </div>
           <NavLink
             className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary-container bg-primary-container font-label-lg text-label-lg text-on-primary-container"

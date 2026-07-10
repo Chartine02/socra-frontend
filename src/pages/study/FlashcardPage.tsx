@@ -82,7 +82,14 @@ export default function FlashcardPage() {
     resetSession()
     queryClient.invalidateQueries({ queryKey: ['document', documentId] })
     queryClient.invalidateQueries({ queryKey: ['documents'] })
-    navigate(`/documents/${documentId}`)
+    navigate('/session/summary', {
+      state: {
+        sessionId: backendSessionId,
+        documentId,
+        mode: 'flashcard',
+        itemsCompleted,
+      },
+    })
   }
 
   if (loading) {

@@ -131,7 +131,15 @@ export default function SocraticPage() {
     resetSession()
     queryClient.invalidateQueries({ queryKey: ['document', documentId] })
     queryClient.invalidateQueries({ queryKey: ['documents'] })
-    navigate(`/documents/${documentId}`)
+    navigate('/session/summary', {
+      state: {
+        sessionId: backendSessionId,
+        documentId,
+        mode: 'socratic',
+        itemsCompleted,
+        finalBloomLevel: currentBloomLevel,
+      },
+    })
   }
 
   if (loading) {
