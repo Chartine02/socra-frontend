@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BookOpen, Loader2, X } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
@@ -36,38 +36,49 @@ export default function SocraticPage() {
     resetSession,
   } = useSessionStore()
 
-  const initSession = useCallback(async () => {
-    if (!documentId) return
-    try {
-      setLoading(true)
-      setError(null)
-
-      const session = await studyService.createSession(documentId, 'socratic')
-      setBackendSessionId(session.id)
-      setCurrentDocumentId(documentId)
-      setMode('socratic')
-
-      // Start the dialogue
-      const opening = await studyService.startDialogue(session.id, documentId)
-      const bloomLevel = opening.bloomLevel.toLowerCase() as BloomLevel
-      setBloomLevel(bloomLevel)
-      addDialogueTurn({
-        id: `ai-${Date.now()}`,
-        role: 'ai',
-        content: opening.question,
-        bloomLevel,
-        timestamp: new Date(),
-      })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start Socratic session')
-    } finally {
-      setLoading(false)
-    }
-  }, [documentId, setBackendSessionId, setCurrentDocumentId, setMode, setBloomLevel, addDialogueTurn])
+  const initCalledRef = useRef(false)
 
   useEffect(() => {
-    initSession()
-  }, [initSession])
+    if (initCalledRef.current || !documentId) return
+    initCalledRef.current = true
+
+    let cancelled = false
+    const init = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        resetSession()
+
+        const session = await studyService.createSession(documentId, 'socratic')
+        if (cancelled) return
+        setBackendSessionId(session.id)
+        setCurrentDocumentId(documentId)
+        setMode('socratic')
+
+        const opening = await studyService.startDialogue(session.id, documentId)
+        if (cancelled) return
+        const bloomLevel = opening.bloomLevel.toLowerCase() as BloomLevel
+        setBloomLevel(bloomLevel)
+        addDialogueTurn({
+          id: `ai-${Date.now()}`,
+          role: 'ai',
+          content: opening.question,
+          bloomLevel,
+          timestamp: new Date(),
+        })
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to start Socratic session')
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    init()
+
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [documentId])
 
   const handleSendMessage = async (content: string) => {
     if (!backendSessionId || !content.trim()) return
@@ -225,7 +236,7 @@ export default function SocraticPage() {
             <div className="prose prose-invert">
               <p className="mb-stack-md font-body-lg text-body-lg leading-relaxed text-socra-stone">
                 This AI-guided Socratic dialogue will progressively climb Bloom's taxonomy,
-                starting from <strong>Remember</strong> and working up to <strong>Create</strong>.
+                starting from Remember and working up to Create.
               </p>
               <p className="mb-stack-md font-body-lg text-body-lg leading-relaxed text-socra-stone">
                 Engage thoughtfully with each question. The AI will adapt its questions based

@@ -104,7 +104,7 @@ export default function PostSessionSummary({ summary, onStudyAgain }: PostSessio
           </h2>
           <ul className="space-y-3">
             {summary.reviewedTopics.map((topic) => {
-              const badge = masteryBadge[topic.mastery]
+              const badge = masteryBadge[topic.mastery] ?? masteryBadge.forgotten
               return (
                 <li
                   className="flex items-center justify-between rounded-lg bg-socra-darkest/30 px-4 py-3"
