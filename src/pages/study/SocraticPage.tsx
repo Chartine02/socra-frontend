@@ -76,7 +76,10 @@ export default function SocraticPage() {
     }
     init()
 
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+      initCalledRef.current = false
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [documentId])
 

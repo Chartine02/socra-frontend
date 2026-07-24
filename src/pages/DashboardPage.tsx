@@ -56,6 +56,12 @@ export default function DashboardPage() {
     })
     .slice(0, 6)
 
+  // Weakest topics by mastery % (fallback when state filter returns nothing)
+  const weakestTopics = (knowledgeGapData?.topics ?? [])
+    .slice()
+    .sort((a, b) => a.masteryPercentage - b.masteryPercentage)
+    .slice(0, 2)
+
   return (
     <div className="min-h-screen bg-surface pb-24 md:pb-0">
       <Navbar />
@@ -121,12 +127,28 @@ export default function DashboardPage() {
 
               {isLoadingGap ? (
                 <div className="flex justify-center py-8"><Spinner /></div>
-              ) : dueTopics.length === 0 ? (
+              ) : topicsDueForReview === 0 ? (
                 <Card>
                   <p className="py-4 text-center text-sm text-on-surface-variant">
                     No topics due for review — great job staying on top of things!
                   </p>
                 </Card>
+              ) : dueTopics.length === 0 ? (
+                <div className="space-y-2">
+                  {weakestTopics.map((topic) => (
+                    <Link
+                      className="flex items-center justify-between rounded-xl border border-socra-forest/15 px-4 py-3 transition-colors hover:border-socra-sage/30"
+                      key={topic.id}
+                      to="/knowledge-gap"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-on-surface">{topic.topic}</p>
+                        <p className="mt-0.5 text-xs text-on-surface-variant">{topic.masteryPercentage}% mastery</p>
+                      </div>
+                      <span className="ml-3 flex-shrink-0 text-xs font-semibold text-socra-sage">Review →</span>
+                    </Link>
+                  ))}
+                </div>
               ) : (
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {dueTopics.map((topic) => (

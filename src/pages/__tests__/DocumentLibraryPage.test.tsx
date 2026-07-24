@@ -4,7 +4,7 @@ import DocumentLibraryPage from '../DocumentLibraryPage'
 import { renderWithProviders } from '../../test/test-utils'
 import { useAuthStore } from '../../store/authStore'
 import { useDocumentStore } from '../../store/documentStore'
-import { mockUser, mockDocument, mockProcessingDocument } from '../../test/mocks'
+import { mockUser } from '../../test/mocks'
 
 vi.mock('../../services/documentService', () => ({
   documentService: {

@@ -137,7 +137,7 @@ describe('SignInForm', () => {
 
     // Click the toggle button (the button inside the password field div)
     const toggleButtons = screen.getAllByRole('button')
-    const visibilityToggle = toggleButtons.find((btn) => btn.type === 'button' && btn !== screen.getByRole('button', { name: /sign in/i }))
+    const visibilityToggle = toggleButtons.find((btn) => (btn as HTMLButtonElement).type === 'button' && btn !== screen.getByRole('button', { name: /sign in/i }))
     if (visibilityToggle) {
       await user.click(visibilityToggle)
       expect(passwordInput).toHaveAttribute('type', 'text')
