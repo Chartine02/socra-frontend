@@ -1,4 +1,4 @@
-import { Eye, EyeOff, UserCircle2 } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
@@ -117,20 +117,6 @@ export default function SignUpForm() {
             Create Account
           </button>
 
-          <div className="relative flex items-center justify-center py-2">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-outline-variant/30" />
-            </div>
-            <span className="relative bg-[#414833] px-4 font-label-sm uppercase text-on-surface-variant">or</span>
-          </div>
-
-          <button
-            className="btn-secondary flex w-full items-center justify-center gap-2 rounded-lg py-3 font-label-lg transition-colors hover:bg-white/5"
-            type="button"
-          >
-            <UserCircle2 size={20} />
-            Continue with Google
-          </button>
         </form>
 
         <div className="mt-stack-lg text-center">
