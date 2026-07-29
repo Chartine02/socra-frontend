@@ -14,6 +14,7 @@ export interface DocumentState {
   uploadingDocs: UploadingDoc[]
   setDocuments: (docs: Document[]) => void
   addDocument: (doc: Document) => void
+  removeDocument: (documentId: string) => void
   setSelectedDocument: (doc: Document) => void
   setUploadProgress: (progress: number) => void
   addUploadingDoc: (doc: UploadingDoc) => void
@@ -33,6 +34,12 @@ export const useDocumentStore = create<DocumentState>()((set) => ({
       selectedDocument: doc,
       isUploading: false,
       uploadProgress: 100,
+    })),
+  removeDocument: (documentId) =>
+    set((state) => ({
+      documents: state.documents.filter((d) => d.id !== documentId),
+      selectedDocument:
+        state.selectedDocument?.id === documentId ? null : state.selectedDocument,
     })),
   setSelectedDocument: (doc) => set({ selectedDocument: doc }),
   setUploadProgress: (progress) =>

@@ -146,16 +146,6 @@ export default function DocumentTopicPanel({ document, onClose }: DocumentTopicP
           </div>
         </section>
       </div>
-
-      <div className="border-t border-outline-variant/10 bg-surface-container-highest p-container-margin">
-        <button
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-secondary py-4 font-label-lg text-label-lg text-on-secondary transition-all hover:brightness-110"
-          type="button"
-        >
-          <Download className="h-5 w-5" />
-          Download Study Summary
-        </button>
-      </div>
     </aside>
   )
 }

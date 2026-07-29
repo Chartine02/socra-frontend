@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   AlertTriangle,
   ArrowLeft,
@@ -13,10 +13,13 @@ import {
   Loader2,
   MessageSquareQuote,
   Sparkles,
+  Trash2,
 } from 'lucide-react'
 import BottomNav from '../components/layout/BottomNav'
 import Navbar from '../components/layout/Navbar'
+import Modal from '../components/ui/Modal'
 import { documentService } from '../services/documentService'
+import { useDocumentStore } from '../store/documentStore'
 import type { Document, KnowledgeUnit } from '../types/document.types'
 
 const masteryMeta: Record<string, { Icon: typeof CheckCircle2; color: string; bg: string }> = {
@@ -56,6 +59,9 @@ function KnowledgeUnitRow({ unit }: { unit: KnowledgeUnit }) {
 export default function DocumentDetailPage() {
   const { documentId } = useParams<{ documentId: string }>()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const removeDocument = useDocumentStore((state) => state.removeDocument)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const { data: document, isLoading, error } = useQuery<Document>({
     queryKey: ['document', documentId],
@@ -64,6 +70,15 @@ export default function DocumentDetailPage() {
     refetchInterval: (query) => {
       const doc = query.state.data
       return doc?.processingStatus === 'PROCESSING' ? 4000 : false
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => documentService.deleteDocument(documentId!),
+    onSuccess: () => {
+      removeDocument(documentId!)
+      queryClient.invalidateQueries({ queryKey: ['documents'] })
+      navigate('/documents')
     },
   })
 
@@ -184,7 +199,17 @@ export default function DocumentDetailPage() {
 
         {/* Document Header */}
         <header className="mb-stack-lg">
-          <h1 className="mb-2 font-headline-lg text-headline-lg text-on-surface">{document.fileName}</h1>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="mb-2 font-headline-lg text-headline-lg text-on-surface">{document.fileName}</h1>
+            <button
+              className="flex items-center gap-2 rounded-lg border border-error/30 px-3 py-2 text-error transition-colors hover:bg-error/10"
+              onClick={() => setShowDeleteModal(true)}
+              type="button"
+            >
+              <Trash2 className="h-4 w-4" /> 
+              <span className="font-label-md text-label-md sm:inline">Delete</span>
+            </button>
+          </div>
           <div className="flex flex-wrap items-center gap-4 text-on-surface-variant">
             <span className="rounded-full bg-primary-container/20 px-3 py-1 font-label-sm text-label-sm text-primary">
               READY
@@ -264,6 +289,40 @@ export default function DocumentDetailPage() {
           )}
         </section>
       </main>
+
+      <Modal isOpen={showDeleteModal} title="Delete Document" onClose={() => setShowDeleteModal(false)}>
+        <p className="mb-4">
+          Are you sure you want to delete &quot;{document.fileName}&quot;? This action cannot be undone and all associated study progress will be lost.
+        </p>
+        {deleteMutation.isError && (
+          <p className="mb-4 text-sm text-red-400">
+            Failed to delete document. Please try again.
+          </p>
+        )}
+        <div className="flex justify-end gap-3">
+          <button
+            className="rounded-lg px-4 py-2 text-socra-stone transition hover:text-socra-tan"
+            onClick={() => setShowDeleteModal(false)}
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-white transition hover:bg-red-700 disabled:opacity-50"
+            disabled={deleteMutation.isPending}
+            onClick={() => deleteMutation.mutate()}
+            type="button"
+          >
+            {deleteMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Trash2 className="h-4 w-4" />
+            )}
+            Delete
+          </button>
+        </div>
+      </Modal>
+
       <BottomNav />
     </div>
   )
