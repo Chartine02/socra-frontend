@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { GraduationCap, PlusCircle } from 'lucide-react'
 import BottomNav from '../components/layout/BottomNav'
@@ -6,7 +7,6 @@ import Navbar from '../components/layout/Navbar'
 import CanvasSyncModal from '../components/documents/CanvasSyncModal'
 import DocumentCard from '../components/documents/DocumentCard'
 import DocumentCardSkeleton from '../components/documents/DocumentCardSkeleton'
-import DocumentTopicPanel from '../components/documents/DocumentTopicPanel'
 import { useDocumentUpload } from '../hooks/useDocumentUpload'
 import { documentService } from '../services/documentService'
 import { useDocumentStore } from '../store/documentStore'
@@ -14,6 +14,7 @@ import type { Document } from '../types/document.types'
 
 export default function DocumentLibraryPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { mutate: upload } = useDocumentUpload()
   const uploadingDocs = useDocumentStore((state) => state.uploadingDocs)
@@ -28,9 +29,7 @@ export default function DocumentLibraryPage() {
     },
   })
 
-  const [activeId, setActiveId] = useState<string | null>(null)
   const [canvasModalOpen, setCanvasModalOpen] = useState(false)
-  const activeDocument = documents.find((doc) => doc.id === activeId) ?? null
 
   const handleUploadClick = () => {
     fileInputRef.current?.click()
@@ -100,17 +99,15 @@ export default function DocumentLibraryPage() {
                 ) : (
                   <DocumentCard
                     document={document}
-                    isActive={document.id === activeId}
+                    isActive={false}
                     key={document.id}
-                    onSelect={setActiveId}
+                    onSelect={(id) => navigate(`/documents/${id}`)}
                   />
                 ),
               )}
             </div>
           )}
         </div>
-
-        {activeDocument && <DocumentTopicPanel document={activeDocument} onClose={() => setActiveId(null)} />}
       </main>
       <CanvasSyncModal
         isOpen={canvasModalOpen}
