@@ -1,4 +1,4 @@
-import { BookOpen, CheckCircle2, ChevronRight, Circle, Clock, Download, Layers, MessageSquareQuote, ShieldCheck, Sparkles, X } from 'lucide-react'
+import { BookOpen, CheckCircle2, ChevronRight, Circle, Clock, Layers, MessageSquareQuote, ShieldCheck, Sparkles, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Document, KnowledgeUnit } from '../../types/document.types'
 
