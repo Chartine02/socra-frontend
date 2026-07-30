@@ -82,6 +82,13 @@ export default function DocumentDetailPage() {
     },
   })
 
+  const reprocessMutation = useMutation({
+    mutationFn: () => documentService.reprocessDocument(documentId!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['document', documentId] })
+    },
+  })
+
   useEffect(() => {
     if (!documentId) navigate('/documents')
   }, [documentId, navigate])
@@ -144,13 +151,26 @@ export default function DocumentDetailPage() {
           <p className="text-on-surface-variant">
             There was an error processing this document. Please try uploading again.
           </p>
-          <button
-            className="rounded-lg bg-primary-container px-4 py-2 text-on-primary-container"
-            onClick={() => navigate('/documents')}
-            type="button"
-          >
-            Back to Library
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              className="rounded-lg bg-[#6b7a2a] px-4 py-2 text-white disabled:opacity-50"
+              onClick={() => reprocessMutation.mutate()}
+              disabled={reprocessMutation.isPending}
+              type="button"
+            >
+              {reprocessMutation.isPending ? 'Retrying...' : 'Retry Processing'}
+            </button>
+            <button
+              className="rounded-lg border border-outline-variant px-4 py-2 text-on-surface"
+              onClick={() => navigate('/documents')}
+              type="button"
+            >
+              Back to Library
+            </button>
+          </div>
+          {reprocessMutation.isError && (
+            <p className="text-sm text-error">Failed to retry processing. Please try again.</p>
+          )}
         </main>
         <BottomNav />
       </div>

@@ -33,4 +33,9 @@ export const documentService = {
   async deleteDocument(documentId: string): Promise<void> {
     await api.delete(`/documents/${documentId}`)
   },
+
+  async reprocessDocument(documentId: string): Promise<Document> {
+    const response = await api.post(`/documents/${documentId}/reprocess`)
+    return unwrap<Document>(response)
+  },
 }
